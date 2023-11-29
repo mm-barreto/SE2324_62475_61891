@@ -1,0 +1,8 @@
+João Amorim patterns reviews:
+
+Template - João Esteves:
+Ok, não diria que uma boa escolha evidenciar o template num metodo, o template normalmente e usada para classes, por exemplo uma classe abstrata que possui metodos que outras classes usam e implementam de maneira diferente. 8/11/23
+
+Abstract Factory - Nádia Mendes:
+Unico comentario que tenho a fazer e que para mim nao e abstract e so factory.
+8/11/23

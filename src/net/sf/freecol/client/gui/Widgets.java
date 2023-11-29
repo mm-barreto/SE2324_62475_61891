@@ -88,27 +88,8 @@ import net.sf.freecol.client.gui.panel.TradeRoutePanel;
 import net.sf.freecol.client.gui.panel.TrainPanel;
 import net.sf.freecol.client.gui.panel.WorkProductionPanel;
 import net.sf.freecol.client.gui.panel.colopedia.ColopediaPanel;
-import net.sf.freecol.client.gui.panel.report.CompactLabourReport;
+import net.sf.freecol.client.gui.panel.report.*;
 import net.sf.freecol.client.gui.panel.report.LabourData.UnitData;
-import net.sf.freecol.client.gui.panel.report.ReportCargoPanel;
-import net.sf.freecol.client.gui.panel.report.ReportClassicColonyPanel;
-import net.sf.freecol.client.gui.panel.report.ReportCompactColonyPanel;
-import net.sf.freecol.client.gui.panel.report.ReportContinentalCongressPanel;
-import net.sf.freecol.client.gui.panel.report.ReportEducationPanel;
-import net.sf.freecol.client.gui.panel.report.ReportExplorationPanel;
-import net.sf.freecol.client.gui.panel.report.ReportForeignAffairPanel;
-import net.sf.freecol.client.gui.panel.report.ReportHighScoresPanel;
-import net.sf.freecol.client.gui.panel.report.ReportHistoryPanel;
-import net.sf.freecol.client.gui.panel.report.ReportIndianPanel;
-import net.sf.freecol.client.gui.panel.report.ReportLabourDetailPanel;
-import net.sf.freecol.client.gui.panel.report.ReportLabourPanel;
-import net.sf.freecol.client.gui.panel.report.ReportMilitaryPanel;
-import net.sf.freecol.client.gui.panel.report.ReportNavalPanel;
-import net.sf.freecol.client.gui.panel.report.ReportProductionPanel;
-import net.sf.freecol.client.gui.panel.report.ReportReligiousPanel;
-import net.sf.freecol.client.gui.panel.report.ReportRequirementsPanel;
-import net.sf.freecol.client.gui.panel.report.ReportTradePanel;
-import net.sf.freecol.client.gui.panel.report.ReportTurnPanel;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.metaserver.ServerInfo;
 import net.sf.freecol.common.model.Colony;
@@ -1254,6 +1235,16 @@ public final class Widgets {
             = this.canvas.getExistingFreeColPanel(ReportReligiousPanel.class);
         if (panel == null) {
             panel = new ReportReligiousPanel(this.freeColClient);
+            this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
+        }
+        return panel;
+    }
+
+    public FreeColPanel showTutorialMissionPanel() {
+        TutorialPanel panel
+                = this.canvas.getExistingFreeColPanel(TutorialPanel.class);
+        if (panel == null) {
+            panel = new TutorialPanel(this.freeColClient);
             this.canvas.showFreeColPanel(panel, PopupPosition.CENTERED, true);
         }
         return panel;

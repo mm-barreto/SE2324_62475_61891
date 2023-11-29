@@ -1,0 +1,3 @@
+João Amorim use case diagram reviews:
+Nádia Mendes:
+Este diagrama esta demasiado funcional, com isto quero dizer que estas em demasia a referencia as operaçoes literalmente quando nao devias.

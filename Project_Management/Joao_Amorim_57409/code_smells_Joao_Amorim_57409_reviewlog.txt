@@ -1,0 +1,8 @@
+João Amorim smells reviews:
+
+Duplicated code - João Esteves:
+Concordo e Discordo, acho que efetivamente estas correto em haver algum codigo duplicado, mas o facto de ser pouco o que esta duplicado e o comportamento ser diferente nao justifica esse code smell.
+8/11/23
+
+Long Method - Nadia Mendes:
+Concordo, e basicamente o mesmo problema de um que encontrei. 

@@ -1,3 +1,12 @@
+# SE Project
+
+-João Amorim 57409 jmamorim  
+-João Esteves 47994 jojoaojo  
+-Nádia Mendes 53175 nadia999999  
+-José Morgado 59457 Jos-Mor  
+-Diogo Lemos 56837 Correia21  
+-Miguel Barreto 61891 mikebar12  
+  
 # FreeCol - Colonization Strategy Game
 
 <!-- [![Coverity Scan Build Status](https://img.shields.io/coverity/scan/13524.svg)](https://scan.coverity.com/projects/freecol-freecol) -->
