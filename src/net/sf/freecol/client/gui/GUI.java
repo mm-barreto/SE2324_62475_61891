@@ -2322,6 +2322,8 @@ public class GUI extends FreeColClientHolder {
      */
     public FreeColPanel showReportEducationPanel() { return null; }
 
+    public FreeColPanel showTutorialMissionPanel(){return null;}
+
     /**
      * Show the Exploration Report.
      *

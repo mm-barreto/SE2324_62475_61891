@@ -91,6 +91,15 @@ public class Player extends FreeColGameObject implements Nameable {
     
     public static final String TAG = "player";
 
+    public boolean hasMoved = false;
+    public boolean hasDisembarked = false;
+    public boolean hasEndedTurn = false;
+    public boolean hasExpRumors = false;
+    public boolean hasLearnSkill = false;
+    public boolean hasbuyGoods = false;
+    public boolean hasSellGoods = false;
+    public boolean hasfirstContact = false;
+    public boolean hasRecruited= false;
     //
     // Types
     //
@@ -379,6 +388,72 @@ public class Player extends FreeColGameObject implements Nameable {
     //
     // Names and naming
     //
+
+    //tutorial variables
+    public synchronized void move(){
+        this.hasMoved = true;
+    }
+
+    public boolean gethasMoved(){
+        return this.hasMoved;
+    }
+
+    public synchronized void disembark(){
+        this.hasDisembarked = true;
+    }
+
+    public boolean gethasDisembarked(){
+        return this.hasDisembarked;
+    }
+
+    public synchronized void endTurn(){
+        this.hasEndedTurn = true;
+    }
+
+    public boolean gethasendTurn(){
+        return this.hasEndedTurn;
+    }
+
+    public synchronized void ExpRumours(){
+        this.hasExpRumors = true;
+    }
+
+    public boolean gethasExpRumours(){
+        return this.hasExpRumors;
+    }
+    public synchronized void learnSkill(){
+        this.hasLearnSkill = true;
+    }
+
+    public boolean gethasLearnSkill(){
+        return this.hasLearnSkill;
+    }
+
+    public synchronized void buyGoods(){
+        this.hasbuyGoods = true;
+    }
+    public boolean gethasbuyGoods(){
+        return this.hasLearnSkill;
+    }
+
+    public synchronized void sellGoods(){
+        this.hasSellGoods = true;
+    }
+    public boolean gethassellGoods(){
+        return this.hasSellGoods;
+    }
+    public synchronized void firstContact(){
+        this.hasfirstContact = true;
+    }
+    public boolean gethasfirstContact(){
+        return this.hasfirstContact;
+    }
+    public synchronized void recruit(){
+        this.hasRecruited = true;
+    }
+    public boolean gethasRecuit(){
+        return this.hasRecruited;
+    }
 
     /**
      * Gets the name of this player.

@@ -19,10 +19,12 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.FreeColClientHolder;
 
@@ -65,13 +67,22 @@ public final class CanvasMouseMotionListener extends FreeColClientHolder impleme
      */
     @Override
     public void mouseDragged(MouseEvent me) {
-        // getButton does not work here, TODO: find out why
+        // Check if the left mouse button is pressed
         if ((me.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != MouseEvent.BUTTON1_DOWN_MASK) {
             return;
         }
-        
-        scrolling.performDragScrollIfActive(me);
+        //mechanism close to the one in MiniMap.java just adapted to use map dimensions
+        double sensitivity = 0.1;
+        final Point focusPoint = getGUI().getFocusMapPoint();
 
-        getGUI().updateGoto(me.getX(), me.getY(), true);
+        //calculate the vector to add to the focus point
+        int deltaX = (int) ((me.getX() - getGUI().getMapViewDimension().width/2) * sensitivity);
+        int deltaY = (int) ((me.getY() - getGUI().getMapViewDimension().height/2) * sensitivity);
+
+        // Adjust the camera position based on the mouse movement
+        final int mapPointX = focusPoint.x + deltaX;
+        final int mapPointY = focusPoint.y + deltaY;
+
+        getGUI().setFocusMapPoint(new Point(mapPointX, mapPointY));
     }
 }

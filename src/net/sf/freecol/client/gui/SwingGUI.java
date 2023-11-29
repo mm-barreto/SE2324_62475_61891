@@ -2480,6 +2480,11 @@ public class SwingGUI extends GUI {
         return this.widgets.showReportEducationPanel();
     }
 
+    @Override
+    public FreeColPanel showTutorialMissionPanel() {
+        return this.widgets.showTutorialMissionPanel();
+    }
+
     /**
      * {@inheritDoc}
      */

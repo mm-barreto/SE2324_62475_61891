@@ -18,12 +18,15 @@
  */
 
 package net.sf.freecol.client.gui.action;
+import net.sf.freecol.client.FreeColClient;
+
 
 import java.awt.event.ActionEvent;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 
 
