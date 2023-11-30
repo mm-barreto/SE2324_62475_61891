@@ -1,4 +1,4 @@
-# SE Project
+# SE Project from Project of group
 
 -João Amorim 57409 jmamorim  
 -João Esteves 47994 jojoaojo  
@@ -6,6 +6,10 @@
 -José Morgado 59457 Jos-Mor  
 -Diogo Lemos 56837 Correia21  
 -Miguel Barreto 61891 mikebar12  
+
+# SE Project
+- Miguel Barreto 61891 mm-barreto
+- Diogo Correia 62475 
   
 # FreeCol - Colonization Strategy Game
 
