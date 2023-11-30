@@ -545,7 +545,7 @@ public class ClientOptions extends OptionGroup {
     /** Compare by ascending age. */
     private static final Comparator<Colony> colonyAgeComparator
         = Comparator.comparingInt(c -> c.getEstablished().getNumber());
-	
+
     /** Compare by name, initialized at run time. */
     private static AtomicReference<Comparator<Colony>> colonyNameComparator
         = new AtomicReference<Comparator<Colony>>(null);

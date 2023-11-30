@@ -2603,4 +2603,8 @@ public class GUI extends FreeColClientHolder {
     public void emergencyPurge() {
 
     }
+
+    public void showAutosaveWarning() {
+
+    }
 }

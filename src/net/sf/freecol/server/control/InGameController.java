@@ -162,7 +162,6 @@ public final class InGameController extends Controller {
     private MonarchAction debugMonarchAction = null;
     private ServerPlayer debugMonarchPlayer = null;
 
-
     /**
      * The constructor to use.
      *
