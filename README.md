@@ -7,7 +7,7 @@
 -Diogo Lemos 56837 Correia21  
 -Miguel Barreto 61891 mikebar12  
 
-# SE Project
+# SE Project fork changes made by
 - Miguel Barreto 61891 mm-barreto
 - Diogo Correia 62475 
   
