@@ -1074,4 +1074,8 @@ public abstract class ServerAPI {
     public boolean work(Unit unit, WorkLocation workLocation) {
         return ask(new WorkMessage(unit, workLocation));
     }
+
+    public void nativeUnitTrade(Unit unit, Unit nativeUnit) {
+        send(new NativeRecruitMessage(unit, nativeUnit));
+    }
 }

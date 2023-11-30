@@ -4342,16 +4342,45 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * nativeunitTrade
      * player interaction to recruit natives
-     * the action will be able to be performed while trading goods, you may trade gold + goods for native units
+     * if you have a native unit next to one of your units or settlements
+     * you may try to recruit it
      *
      * the natives may accept or not (depending on the natives attitude)
-     * if the natives accepts, you may choose which unit to recruit and which settlement to put it on
-     * you may trade goods units and gold for the native unit (where a more experienced unit worth more)
-     * after that, the traded units will be removed from the map
-     * and the recruited unit will be put on the chosen settlement
+     * if the natives accepts, you may choose which settlement to put it on
+     * you may trade goods and or gold for the native unit (where a more experienced unit worth more)
+     * the gold is paid to the natives and the goods are traded for the unit (where the natives will take the goods)
+     * after that, the traded units will be removed from the map and put on the chosen settlement
      *
      */
+
+    public void nativeUnitTradeHandler(Unit unit, Unit nativeUnit, int gold, List<Goods> goods) {
+        final Player player = getMyPlayer();
+        final Unit carrier = unit.getCarrier();
+        final Tile tile = unit.getTile();
+        final Colony colony = unit.getColony();
+        final IndianSettlement is = nativeUnit.getTile().getIndianSettlement();
+        final StringTemplate prompt = StringTemplate
+                .template("nativeUnitTrade.text")
+                .addStringTemplate("%nation%", is.getOwner().getNationLabel())
+                .addStringTemplate("%settlement%", is.getLocationLabelFor(player));
+
+        if (gold < 0) {
+            ; //fail
+        } else if (!player.checkGold(gold)) {
+            showInformationPanel(is, StringTemplate
+                    .template("nativeUnitTrade.goldFail")
+                    .add("%player%", is.getOwner().getName())
+                    .addAmount("%amount%", gold));
+        } else {
+            invokeLater(() -> {
+                if (getGUI().confirm(unit.getTile(), prompt, unit, "yes", "no")) {
+                    askServer().nativeUnitTrade(unit, nativeUnit, gold, goods);
+                }
+            });
+        }
+
 
     /**
      * A player names the New World.
