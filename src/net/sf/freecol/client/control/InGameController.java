@@ -4342,6 +4342,18 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
+     * player interaction to recruit natives
+     * the action will be able to be performed while trading goods, you may trade gold + goods for native units
+     *
+     * the natives may accept or not (depending on the natives attitude)
+     * if the natives accepts, you may choose which unit to recruit and which settlement to put it on
+     * you may trade goods units and gold for the native unit (where a more experienced unit worth more)
+     * after that, the traded units will be removed from the map
+     * and the recruited unit will be put on the chosen settlement
+     *
+     */
+
+    /**
      * A player names the New World.
      *
      * Called from GUI.showNameNewLandDialog
