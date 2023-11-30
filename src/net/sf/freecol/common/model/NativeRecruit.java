@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.sf.freecol.common.model.NativeTrade.getNativeTradeKey;
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
 
 /**
  * A native unit to be traded with europeans.
@@ -206,6 +207,171 @@ public class NativeRecruit extends FreeColGameObject {
      */
     public boolean hasNotTraded() {
         return getGift();
+    }
+
+    /**
+     * Get the transaction count.
+     *
+     * @return The transaction count.
+     */
+    public int getCount() {
+        return this.count;
+    }
+
+    /**
+     * Set the transaction count.
+     *
+     * @param count The new transaction count.
+     */
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    /**
+     * Is this transaction complete?
+     *
+     * @return True if the transaction is over.
+     */
+    public boolean getDone() {
+        return this.count < 0
+                || (!canGift());
+    }
+
+    /**
+     * Set this transaction as complete.
+     */
+    public void setDone() {
+        this.count = -1;
+    }
+
+    /**
+     * Get the list of items the unit is able to offer the unit.
+     * to recruit or to gift to the native unit.
+     * (the goods will be deposited on one of the native's settlements)
+     *
+     * @return The list of {@code NativeTradeItem}s.
+     *
+     * @see NativeTradeItem
+     */
+    public List<NativeTradeItem> getUnitToNativeSettlement() {
+        return this.unitToNativeSettlement;
+    }
+
+    /**
+     * get the list of items the native is carrying.
+     * (the goods will be deposited on one of the native's settlements)
+     *
+     */
+    public List<NativeTradeItem> getNativeToNativeSettlement() {
+        return this.nativeToNativeSettlement;
+    }
+
+    /**
+     * Add an item to the unit list of items.
+     *
+     * @param nti The {@code NativeTradeItem} to add.
+     */
+    public void addToUnit(NativeTradeItem nti) {
+        this.unitToNativeSettlement.add(nti);
+    }
+
+    /**
+     * Remove an item from the unit list of items.
+     *
+     * @param nti The {@code NativeTradeItem} to remove.
+     */
+    public void removeFromUnit(NativeTradeItem nti) {
+        removeInPlace(this.unitToNativeSettlement, nti.goodsMatcher());
+    }
+
+    /**
+     * remove all native's goods from the native's list of items.
+     * (the goods will be deposited on one of the native's settlements)
+     *
+     */
+    public void removeAllFromNative() {
+        this.nativeToNativeSettlement.clear();
+    }
+
+
+    /**
+     * Raw initialization of the unit.
+     * does not do pricing.
+     */
+    public void initialize() {
+        final Player unitPlayer = this.unit.getOwner();
+
+        final Player nativePlayer = this.nativeUnit.getOwner();
+
+        final Game game = this.unit.getGame();
+
+        for (Goods g : this.unit.getGoodsList()) {
+            this.unitToNativeSettlement.add(new NativeTradeItem(game,
+                    unitPlayer, nativePlayer, g));
+        }
+        for (Goods g : this.nativeUnit.getGoodsList()) {
+            this.nativeToNativeSettlement.add(new NativeTradeItem(game,
+                    nativePlayer, nativePlayer, g));
+        }
+    }
+
+    /**
+     * Merge another compatible native trade into this one.
+     *
+     * @param nt The {@code NativeTrade} to merge.
+     */
+    /** TODO **/
+
+
+    /**
+     * Choose the next available upward haggling price.
+     *
+     * @param price The initial price.
+     * @return The new upward haggled price.
+     */
+    public static int haggleUp(int price) {
+        return (price * 11) / 10;
+    }
+
+    /**
+     * Choose the next available downward haggling price.
+     *
+     * @param price The initial price.
+     * @return The new downward haggled price.
+     */
+    public static int haggleDown(int price) {
+        return (price * 9) / 10;
+    }
+
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isInternable() {
+        return false;
+    }
+
+    // Override FreeColGameObject
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T extends FreeColObject> boolean copyIn(T other) {
+        NativeTrade o = copyInCast(other, NativeTrade.class);
+        if (o == null || !super.copyIn(o)) return false;
+        final Game game = getGame();
+        this.unit = game.updateRef(o.getUnit());
+        this.count = o.getCount();
+        this.buy = o.getBuy();
+        this.sell = o.getSell();
+        this.gift = o.getGift();
+        this.item = game.update(o.getItem(), false);
+        this.unitToSettlement = game.update(o.getUnitToSettlement(), false);
+        this.settlementToUnit = game.update(o.getSettlementToUnit(), false);
+        return true;
     }
 
 }
