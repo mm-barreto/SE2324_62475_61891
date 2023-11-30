@@ -1,4 +1,4 @@
-# SE Project from Project of group
+# SE Project forked from Project of group
 
 -João Amorim 57409 jmamorim  
 -João Esteves 47994 jojoaojo  
