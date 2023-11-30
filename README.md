@@ -5,7 +5,7 @@
 -Nádia Mendes 53175 nadia999999  
 -José Morgado 59457 Jos-Mor  
 -Diogo Lemos 56837 Correia21  
--Miguel Barreto 61891 mikebar12  
+-Miguel Barreto 61891 mm-barreto  
 
 # SE Project fork changes made by
 - Miguel Barreto 61891 mm-barreto
