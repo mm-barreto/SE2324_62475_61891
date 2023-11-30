@@ -159,4 +159,9 @@ public interface Constants {
         HAGGLE,
         GIFT
     }
+
+    public static enum NativeRecruitAction {
+        RECRUIT,
+        GIFT
+    }
 }

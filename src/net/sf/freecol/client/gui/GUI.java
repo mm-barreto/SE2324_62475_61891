@@ -680,6 +680,40 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
+     * Get the user choice when recruiting a native unit.
+     *
+     * @param settlement The native unit owner to trade with.
+     * @param template A {@code StringTemplate} containing the message
+     *     to display.
+     * @param canRecruit Show a "recruit" option.
+     * @param canGift Show a "gift" option.
+     * @return The chosen action, buy, sell, gift or cancel.
+     */
+    public TradeAction getIndianSettlementRecruitChoice(Settlement settlement,
+                                                      StringTemplate template,
+                                                      boolean canRecruit,
+                                                      boolean canGift) {
+        String msg;
+        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
+        if (canBuy) {
+            msg = Messages.message("tradeProposition.toBuy");
+            choices.add(new ChoiceItem<>(msg, TradeAction.BUY, canBuy));
+        }
+        if (canSell) {
+            msg = Messages.message("tradeProposition.toSell");
+            choices.add(new ChoiceItem<>(msg, TradeAction.SELL, canSell));
+        }
+        if (canGift) {
+            msg = Messages.message("tradeProposition.toGift");
+            choices.add(new ChoiceItem<>(msg, TradeAction.GIFT, canGift));
+        }
+        if (choices.isEmpty()) return null;
+
+        return getChoice(settlement.getTile(), template,
+                settlement, "cancel", choices);
+    }
+
+    /**
      * Get the user choice of what to do with a missionary at a native
      * settlement.
      *

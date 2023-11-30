@@ -21,29 +21,12 @@ package net.sf.freecol.server.ai;
 
 import java.util.List;
 
-import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
-import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
 
 
 /**
@@ -435,6 +418,18 @@ public class AIMessage {
         NativeTradeAction action, NativeTrade nt) {
         return aiPlayer.askServer()
             .nativeTrade(action, nt);
+    }
+
+    /**
+     * Respond to a native recruit offer.
+     *
+     * @param aiPlayer The {@code AIPlayer} that is trading.
+     * @param result The {@code NativeRecruitAction} to take.
+     * @param nt The proposed {@code NativeRecruit}.
+     *
+     * @return True if the message was sent, and a non-error reply returned.
+     */
+    public static void askNativeRecruit(AIPlayer aiPlayer, NativeRecruitAction result, NativeRecruit nt) {
     }
 
     /**

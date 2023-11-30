@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -57,12 +58,7 @@ import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColDirectories;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractGoods;
-import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyWas;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Constants.ArmedUnitSettlementAction;
 import net.sf.freecol.common.model.Constants.ClaimAction;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
@@ -72,61 +68,17 @@ import net.sf.freecol.common.model.Constants.ScoutIndianSettlementAction;
 import net.sf.freecol.common.model.Constants.TradeAction;
 import net.sf.freecol.common.model.Constants.TradeBuyAction;
 import net.sf.freecol.common.model.Constants.TradeSellAction;
-import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.Direction;
-import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Europe.MigrationType;
-import net.sf.freecol.common.model.EuropeWas;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Game.LogoutReason;
-import net.sf.freecol.common.model.GoldTradeItem;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HighScore;
-import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.LastSale;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.MarketWas;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
-import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.Nameable;
-import net.sf.freecol.common.model.NationSummary;
-import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.NativeTradeItem;
-import net.sf.freecol.common.model.ObjectWas;
-import net.sf.freecol.common.model.Ownable;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
 import net.sf.freecol.common.model.Player.NoClaimReason;
-import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.StringTemplate;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TradeLocation;
-import net.sf.freecol.common.model.TradeRoute;
-import net.sf.freecol.common.model.TradeRouteStop;
-import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitChangeType;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange;
-import net.sf.freecol.common.model.UnitWas;
-import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
@@ -4342,44 +4294,105 @@ public final class InGameController extends FreeColClientHolder {
     }
 
     /**
-     * nativeunitTrade
-     * player interaction to recruit natives
-     * if you have a native unit next to one of your units or settlements
-     * you may try to recruit it
+     * Recruit a native unit
      *
-     * the natives may accept or not (depending on the natives attitude)
-     * if the natives accepts, you may choose which settlement to put it on
-     * you may trade goods and or gold for the native unit (where a more experienced unit worth more)
-     * the gold is paid to the natives and the goods are traded for the unit (where the natives will take the goods)
-     * after that, the traded units will be removed from the map and put on the chosen settlement
+     * Works like nativeTrade, but with a different prompt and instead of trading with a settlement, the player
+     * recruits a unit, offering goods and or gold in exchange.
+     * (The unit is not actually recruited until the server confirms the trade.)
+     * (goods and gold are not actually removed from the player's inventory until the server confirms the trade.)
+     * (after the trade, the player's gold and goods are updated to reflect the trade and goods are sent to the
+     * native settlement.)
      *
-     */
+     **/
 
-    public void nativeUnitTradeHandler(Unit unit, Unit nativeUnit, int gold, List<Goods> goods) {
-        final Player player = getMyPlayer();
-        final Unit carrier = unit.getCarrier();
-        final Tile tile = unit.getTile();
-        final Colony colony = unit.getColony();
-        final IndianSettlement is = nativeUnit.getTile().getIndianSettlement();
-        final StringTemplate prompt = StringTemplate
-                .template("nativeUnitTrade.text")
-                .addStringTemplate("%nation%", is.getOwner().getNationLabel())
-                .addStringTemplate("%settlement%", is.getLocationLabelFor(player));
+    private void nativeRecruit(NativeRecruit nt, NativeRecruitAction act,
+                               NativeTradeItem nti, StringTemplate prompt) {
+        final Unit nativeUnit = nt.getNativeUnit();
+        final Unit unit = nt.getUnit();
+        final StringTemplate base = StringTemplate
+                .template("trade.welcome")
+                .addStringTemplate("%nation%", nativeUnit.getOwner().getNationLabel())
+                .addStringTemplate("%settlement%", nativeUnit.getLocationLabelFor(unit.getOwner()));
 
-        if (gold < 0) {
-            ; //fail
-        } else if (!player.checkGold(gold)) {
-            showInformationPanel(is, StringTemplate
-                    .template("nativeUnitTrade.goldFail")
-                    .add("%player%", is.getOwner().getName())
-                    .addAmount("%amount%", gold));
-        } else {
-            invokeLater(() -> {
-                if (getGUI().confirm(unit.getTile(), prompt, unit, "yes", "no")) {
-                    askServer().nativeUnitTrade(unit, nativeUnit, gold, goods);
-                }
-            });
+        // here the settlement won't offer items, it will be the native unit to be recruited
+
+        while (!nt.getDone()) {
+            if (act == null) {
+                if (prompt == null) prompt = base;
+                act = getGUI().getIndianSettlementRecruitChoice(, prompt,
+                        nt.canRecruit(), nt.canGift());
+                if (act == null) break;
+                prompt = base; // Revert to base after first time through
+            }
+            switch (act) {
+                case RECRUIT:
+                    act = null;
+                    if (nti == null) {
+                        nti = getGUI().getChoice(unit.getTile(),
+                                StringTemplate.key("buyProposition.text"),
+                                is, "nothing",
+                                transform(nt.getSettlementToUnit(),
+                                        NativeTradeItem::priceIsValid, goodsMapper));
+                        if (nti == null) break;
+                        nt.setItem(nti);
+                    }
+                    TradeBuyAction tba = getGUI().getBuyChoice(unit, is,
+                            nti.getGoods(), nti.getPrice(),
+                            unit.getOwner().checkGold(nti.getPrice()));
+                    if (tba == TradeBuyAction.BUY) {
+                        askServer().nativeTrade(NativeTradeAction.BUY, nt);
+                        return;
+                    } else if (tba == TradeBuyAction.HAGGLE) {
+                        nti.setPrice(NativeTradeItem.PRICE_UNSET);
+                        askServer().nativeTrade(NativeTradeAction.BUY, nt);
+                        return;
+                    }
+                    break;
+                case SELL:
+                    act = null;
+                    if (nti == null) {
+                        nti = getGUI().getChoice(unit.getTile(),
+                                StringTemplate.key("sellProposition.text"),
+                                is, "nothing",
+                                transform(nt.getUnitToSettlement(),
+                                        NativeTradeItem::priceIsValid, goodsMapper));
+                        if (nti == null) break;
+                        nt.setItem(nti);
+                    }
+                    TradeSellAction tsa = getGUI().getSellChoice(unit, is,
+                            nti.getGoods(), nti.getPrice());
+                    if (tsa == TradeSellAction.SELL) {
+                        askServer().nativeTrade(NativeTradeAction.SELL, nt);
+                        return;
+                    } else if (tsa == TradeSellAction.HAGGLE) {
+                        nti.setPrice(NativeTradeItem.PRICE_UNSET);
+                        askServer().nativeTrade(NativeTradeAction.SELL, nt);
+                        return;
+                    }
+                    break;
+                case GIFT:
+                    act = null;
+                    nti = getGUI().getChoice(unit.getTile(),
+                            StringTemplate.key("gift.text"),
+                            is, "cancel",
+                            transform(nt.getUnitToSettlement(), alwaysTrue(),
+                                    goodsMapper));
+                    if (nti != null) {
+                        nt.setItem(nti);
+                        askServer().nativeTrade(NativeTradeAction.GIFT, nt);
+                        return;
+                    }
+                    break;
+                default:
+                    logger.warning("showIndianSettlementTradeDialog fail: "
+                            + act);
+                    nt.setDone();
+                    break;
+            }
+            nti = null;
         }
+
+    }
 
 
     /**

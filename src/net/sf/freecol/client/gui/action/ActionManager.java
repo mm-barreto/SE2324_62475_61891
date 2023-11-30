@@ -26,7 +26,6 @@ import java.util.List;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.action.ColopediaAction.PanelType;
 import net.sf.freecol.client.gui.action.DisplayTileTextAction.DisplayText;
 import net.sf.freecol.client.gui.panel.UnitButton;

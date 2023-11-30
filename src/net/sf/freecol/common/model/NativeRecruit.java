@@ -1,9 +1,15 @@
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.io.FreeColXMLWriter;
+
+import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static net.sf.freecol.common.model.NativeTrade.getNativeTradeKey;
+import static net.sf.freecol.common.util.CollectionUtils.any;
 import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
 
 /**
@@ -14,12 +20,17 @@ import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
 
 public class NativeRecruit extends FreeColGameObject {
 
-    private static final StringTemplate abortTrade
+    private static final Logger logger = Logger.getLogger(NativeRecruit.class.getName());
+
+    public static final String TAG = "nativeRecruit";
+
+    private static final StringTemplate abortRecruit
             = StringTemplate.template("");
+
 
     @Override
     public String getXMLTagName() {
-        return null;
+        return TAG;
     }
 
     public static enum NativeRecruitAction {
@@ -89,21 +100,18 @@ public class NativeRecruit extends FreeColGameObject {
     /** True if no gifts made in this trade. */
     private boolean gift;
 
-    /** the item to be traded is the native unit.
-     * but the goods and/or gold will be traded as well, and deposited on the native's current settlement.
-     * */
-    private IndianSettlement settlement;
+    /** True if the unit is being recruited. */
+    private boolean recruit;
+
+    /** An item under consideration for a transaction. */
+    private NativeTradeItem item;
+
 
     /**
      * The goods on the unit that are being offered to the native unit to be recruited.
      * it will be deposited on the native's current settlement.
      */
     private List<NativeTradeItem> unitToNativeSettlement = new ArrayList<>();
-
-    /**
-     * goods that the native is carrying with him, will also be deposited on the native's current settlement.
-     */
-    private List<NativeTradeItem> nativeToNativeSettlement = new ArrayList<>();
 
     /**
      * Simple constructor, used in Game.newInstance.
@@ -119,7 +127,7 @@ public class NativeRecruit extends FreeColGameObject {
      * Create a new trade session.
      *
      * @param unit The {@code Unit} that is trading.
-     * @param is The {@code IndianSettlement} to trade with.
+     * @param nativeUnit The {@code IndianSettlement} to trade with.
      */
     public NativeRecruit(Unit unit, Unit nativeUnit) {
         this(unit.getGame(), ""); // Identifier not needed
@@ -127,7 +135,7 @@ public class NativeRecruit extends FreeColGameObject {
         this.unit = unit;
         this.nativeUnit = nativeUnit;
         this.count = 0;
-        this.gift = true;
+        this.recruit = this.gift = true;
     }
 
     /**
@@ -144,7 +152,23 @@ public class NativeRecruit extends FreeColGameObject {
      *
      * @return A suitable key.
      */
-    /** TODO **/
+    public String getKey() {
+        return getRecruitTradeKey(this.unit, this.nativeUnit);
+    }
+
+    /**
+     * Make a transaction key for a native trade.
+     *
+     * @param unit The {@code Unit} that is trading.
+     *             (the unit that is trying to recruit the native unit)
+     * @param nativeUnit The {@code Unit} that is trading.
+     *                   (the unit that is being recruited)
+     * @return A suitable key.
+     */
+    public static String getRecruitTradeKey(Unit unit, Unit nativeUnit) {
+        return unit.getId() + "-" + nativeUnit.getId();
+    }
+
 
     /**
      * Get the unit that is trading.
@@ -165,12 +189,21 @@ public class NativeRecruit extends FreeColGameObject {
     }
 
     /**
-     * Get the native settlement that is receiving the goods.
+     * is recruiting available in this transaction?
      *
-     * @return The {@code IndianSettlement} that started the trade.
+     * @return True if no blocking recruit has been made.
      */
-    public IndianSettlement getSettlement() {
-        return this.settlement;
+    public boolean getRecruit() {
+        return this.recruit;
+    }
+
+    /**
+     * Can the unit owner recruit the native unit in this session at present?
+     *
+     * @return True if not blocked, and the unit has goods to give.
+     */
+    public boolean canRecruit() {
+        return getRecruit() && !atWar() && any(getUnitToNativeSettlement(), NativeTradeItem::priceIsValid);
     }
 
     /**
@@ -180,6 +213,14 @@ public class NativeRecruit extends FreeColGameObject {
      */
     public boolean getGift() {
         return this.gift;
+    }
+
+    /**
+     * set the recruit state.
+     * @param recruit The new recruit state.
+     */
+    public void setRecruit(boolean recruit) {
+        this.recruit = recruit;
     }
 
     /**
@@ -234,7 +275,7 @@ public class NativeRecruit extends FreeColGameObject {
      */
     public boolean getDone() {
         return this.count < 0
-                || (!canGift());
+                || (!canGift() && !canRecruit());
     }
 
     /**
@@ -242,6 +283,28 @@ public class NativeRecruit extends FreeColGameObject {
      */
     public void setDone() {
         this.count = -1;
+    }
+
+    /**
+     * Get the item being traded.
+     *
+     * @return The current {@code NativeTradeItem}.
+     */
+    public NativeTradeItem getItem() {
+        return this.item;
+    }
+
+    /**
+     * Set the item being traded.
+     *
+     * @param nti The new {@code NativeTradeItem}.
+     */
+    public void setItem(NativeTradeItem nti) {
+        this.item = nti;
+    }
+
+    public Unit getUnitToRecruit() {
+        return this.nativeUnit;
     }
 
     /**
@@ -255,15 +318,6 @@ public class NativeRecruit extends FreeColGameObject {
      */
     public List<NativeTradeItem> getUnitToNativeSettlement() {
         return this.unitToNativeSettlement;
-    }
-
-    /**
-     * get the list of items the native is carrying.
-     * (the goods will be deposited on one of the native's settlements)
-     *
-     */
-    public List<NativeTradeItem> getNativeToNativeSettlement() {
-        return this.nativeToNativeSettlement;
     }
 
     /**
@@ -285,12 +339,23 @@ public class NativeRecruit extends FreeColGameObject {
     }
 
     /**
+     * Is another native recruit compatible with this one?
+     *
+     * @param nt The {@code NativeRecruit} to check.
+     *
+     * @return True if compatible.
+     */
+    public boolean isCompatible(NativeRecruit nt) {
+        return this.getKey().equals(nt.getKey());
+    }
+
+    /**
      * remove all native's goods from the native's list of items.
      * (the goods will be deposited on one of the native's settlements)
      *
      */
-    public void removeAllFromNative() {
-        this.nativeToNativeSettlement.clear();
+    public void removeAllItemsFromNative() {
+        this.nativeUnit.getGoodsList().clear();
     }
 
 
@@ -309,10 +374,6 @@ public class NativeRecruit extends FreeColGameObject {
             this.unitToNativeSettlement.add(new NativeTradeItem(game,
                     unitPlayer, nativePlayer, g));
         }
-        for (Goods g : this.nativeUnit.getGoodsList()) {
-            this.nativeToNativeSettlement.add(new NativeTradeItem(game,
-                    nativePlayer, nativePlayer, g));
-        }
     }
 
     /**
@@ -320,8 +381,13 @@ public class NativeRecruit extends FreeColGameObject {
      *
      * @param nt The {@code NativeTrade} to merge.
      */
-    /** TODO **/
-
+    public void merge(final NativeRecruit nt) {
+        if (isCompatible(nt) && this.equals(nt)) {
+            this.unitToNativeSettlement.clear();
+            this.unitToNativeSettlement.addAll(nt.getUnitToNativeSettlement());
+            this.item = nt.getItem();
+        }
+    }
 
     /**
      * Choose the next available upward haggling price.
@@ -360,18 +426,148 @@ public class NativeRecruit extends FreeColGameObject {
      */
     @Override
     public <T extends FreeColObject> boolean copyIn(T other) {
-        NativeTrade o = copyInCast(other, NativeTrade.class);
+        NativeRecruit o = copyInCast(other, NativeRecruit.class);
         if (o == null || !super.copyIn(o)) return false;
         final Game game = getGame();
         this.unit = game.updateRef(o.getUnit());
+        this.nativeUnit = game.updateRef(o.getNativeUnit());
         this.count = o.getCount();
-        this.buy = o.getBuy();
-        this.sell = o.getSell();
+        this.recruit = o.getRecruit();
         this.gift = o.getGift();
         this.item = game.update(o.getItem(), false);
-        this.unitToSettlement = game.update(o.getUnitToSettlement(), false);
-        this.settlementToUnit = game.update(o.getSettlementToUnit(), false);
+        this.unitToNativeSettlement = game.update(o.getUnitToNativeSettlement(), false);
         return true;
     }
 
+    // Serialization
+    private static final String RECRUIT_TAG = "recruit";
+    private static final String COUNT_TAG = "count";
+    private static final String GIFT_TAG = "gift";
+    private static final String UNIT_TAG = "unit";
+    private static final String NATIVE_UNIT = "nativeUnit";
+    private static final String UNIT_TO_NATIVE_SETTLEMENT_TAG = "unitToNativeSettlement";
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeAttributes(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeAttributes(xw);
+
+        xw.writeAttribute(RECRUIT_TAG, this.recruit);
+
+        xw.writeAttribute(COUNT_TAG, this.count);
+
+        xw.writeAttribute(GIFT_TAG, this.gift);
+
+        xw.writeAttribute(NATIVE_UNIT, this.nativeUnit.name + "\nExp:" + this.nativeUnit.experience + "\nExp Type:" + this.nativeUnit.experienceType + "\nRole:" + nativeUnit.role);
+
+        xw.writeAttribute(UNIT_TAG, this.unit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void writeChildren(FreeColXMLWriter xw) throws XMLStreamException {
+        super.writeChildren(xw);
+
+        xw.writeStartElement(UNIT_TO_NATIVE_SETTLEMENT_TAG);
+
+        for (NativeTradeItem nti : this.unitToNativeSettlement) nti.toXML(xw);
+
+        xw.writeEndElement();
+
+        if (this.nativeUnit != null) this.nativeUnit.toXML(xw);
+        if (this.item != null) this.item.toXML(xw);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readAttributes(FreeColXMLReader xr) throws XMLStreamException {
+        final Game game = getGame();
+        super.readAttributes(xr);
+
+        this.recruit = xr.getAttribute(RECRUIT_TAG, false);
+
+        this.count = xr.getAttribute(COUNT_TAG, -1);
+
+        this.gift = xr.getAttribute(GIFT_TAG, false);
+
+        this.nativeUnit = xr.getAttribute(game, NATIVE_UNIT, Unit.class, (Unit) null);
+
+        this.unit = xr.getAttribute(game, UNIT_TAG, Unit.class, (Unit)null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChildren(FreeColXMLReader xr) throws XMLStreamException {
+        // Clear containers
+        this.unitToNativeSettlement.clear();
+        this.item = null;
+        //this.nativeUnit.setOwner(null);
+
+        /*
+         * @Warning
+         * this may cause a bug
+         */
+
+        super.readChildren(xr);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void readChild(FreeColXMLReader xr) throws XMLStreamException {
+        String tag = xr.getLocalName();
+        Game game = getGame();
+
+        if (UNIT_TO_NATIVE_SETTLEMENT_TAG.equals(tag)) {
+            while (xr.moreTags()) {
+                tag = xr.getLocalName();
+                if (NativeTradeItem.TAG.equals(tag)) {
+                    this.unitToNativeSettlement.add(new NativeTradeItem(game, xr));
+                } else {
+                    logger.warning("UnitToSettlement-item expected, not: " + tag);
+                }
+            }
+
+            /**} else if (NATIVE_UNIT.equals(tag)) {
+            this.item = new NativeTradeItem(game, xr);
+**/
+        } else if (NativeTradeItem.TAG.equals(tag)) {
+            this.item = new NativeTradeItem(game, xr);
+
+        } else {
+            super.readChild(xr);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(128);
+        NativeTradeItem item = getItem();
+        sb.append('[').append(TAG)
+                .append(' ').append(getUnit().getId())
+                .append(' ').append(getNativeUnit().getId())
+                .append(" recruit=").append(getRecruit())
+                .append(" gift=").append(getGift())
+                .append(" count=").append(getCount())
+                .append(" item=").append((item == null) ? "null" : item.toString())
+                .append(" unitToNativeSettlement[");
+        for (NativeTradeItem nti : this.unitToNativeSettlement) {
+            sb.append(' ').append(nti);
+        }
+        sb.append("] recruiting[");
+            sb.append(' ').append(nativeUnit.name).append("\nExp:").append(nativeUnit.experience).append("\nExp Type:").append(nativeUnit.experienceType).append("\nRole:").append(nativeUnit.role);
+        return sb.append(" ]]").toString();
+    }
 }

@@ -31,8 +31,6 @@ import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,7 +38,6 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.FreeColButton.ButtonStyle;

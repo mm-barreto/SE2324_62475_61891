@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.dialog.ClientOptionsDialog;

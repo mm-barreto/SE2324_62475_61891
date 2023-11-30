@@ -37,7 +37,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.CargoPanel;

@@ -33,24 +33,14 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
-import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.*;
+
 import static net.sf.freecol.common.model.Constants.*;
-import net.sf.freecol.common.model.DiplomaticTrade;
+
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.NationSummary;
-import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
 import net.sf.freecol.common.networking.Connection;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import net.sf.freecol.common.util.LogBuilder;
@@ -462,6 +452,19 @@ public abstract class AIPlayer extends AIObject {
     }
 
     /**
+     * Handle a native recruit
+     *
+     * @param action The {@code NativeRecruitAction} to perform.
+     * @param nt The {@code NativeRecruit} itself.
+     */
+    public void nativeRecruitHandler(NativeRecruit.NativeRecruitAction action, NativeRecruit nt) {
+        invoke(() -> {
+            NativeRecruit.NativeRecruitAction result = handleTrade(action, nt);
+            AIMessage.askNativeRecruit(this, result, nt);
+        });
+    }
+
+    /**
      * Handle a new land name.
      *
      * @param unit The {@code Unit} discovering the new world.
@@ -571,7 +574,18 @@ public abstract class AIPlayer extends AIObject {
      */
     public abstract NativeTradeAction handleTrade(NativeTradeAction action,
                                                   NativeTrade nt);
-    
+
+
+    /**
+     * Handle a recruit trade request.
+     *
+     * @param action The {@code NativeTradeAction} to perform.
+     * @param nt The {@code NativeTrade} to handle.
+     * @return The action in response.
+     */
+    public abstract NativeRecruitAction handleTrade(NativeRecruitAction action,
+                                                                  NativeRecruit nt);
+
     /**
      * Decides to accept a tax raise or not.
      * Overridden by the European player.
@@ -692,4 +706,6 @@ public abstract class AIPlayer extends AIObject {
      * {@inheritDoc}
      */
     public String getXMLTagName() { return TAG; }
+
+
 }

@@ -32,7 +32,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.panel.Utility;
 import net.sf.freecol.common.debug.DebugUtils;

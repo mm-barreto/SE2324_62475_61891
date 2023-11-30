@@ -35,7 +35,6 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ClientInputHandler;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.SoundController;

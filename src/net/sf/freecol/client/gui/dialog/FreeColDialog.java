@@ -48,7 +48,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.GUI;
