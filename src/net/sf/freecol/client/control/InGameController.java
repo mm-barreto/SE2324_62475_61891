@@ -27,6 +27,8 @@ import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.report.ReportHistoryPanel;
+import net.sf.freecol.client.gui.panel.report.ReportPanel;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.DebugUtils;
 import net.sf.freecol.common.debug.FreeColDebugger;
@@ -1968,6 +1970,9 @@ public final class InGameController extends FreeColClientHolder {
                 //tile.setTriggerEvent();
         }
         //when this event is triggered you either get gold or a unit is added in Europe
+        //the chance of getting gold is 95%
+        //the chance of getting a unit is 5%
+        //send a message to the player that this event has been triggered
         if (unit.getTile().hasRiver()) {
             System.out.println("river");
 
@@ -1979,6 +1984,8 @@ public final class InGameController extends FreeColClientHolder {
 
                     int gold = (int) (Math.random() * 250);
                     unit.getOwner().modifyGold(gold);
+
+                    //getGUI().("You have found " + gold + " gold in the river!");
                 } else {
                     System.out.println("river add unit event");
 
