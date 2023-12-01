@@ -160,8 +160,13 @@ public interface Constants {
         GIFT
     }
 
-    public static enum NativeRecruitAction {
+    public static enum NativeRecruitInteractionAction {
         RECRUIT,
         GIFT
+    }
+
+    public static enum NativeRecruitAction {
+        ACCEPT,
+        HAGGLE
     }
 }

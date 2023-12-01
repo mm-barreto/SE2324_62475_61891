@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static net.sf.freecol.common.model.NativeTrade.getNativeTradeKey;
 import static net.sf.freecol.common.util.CollectionUtils.any;
-import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
 
 /**
  * A native unit to be traded with europeans.
@@ -26,7 +24,6 @@ public class NativeRecruit extends FreeColGameObject {
 
     private static final StringTemplate abortRecruit
             = StringTemplate.template("");
-
 
     @Override
     public String getXMLTagName() {
@@ -113,11 +110,12 @@ public class NativeRecruit extends FreeColGameObject {
      */
     private List<NativeTradeItem> unitToNativeSettlement = new ArrayList<>();
 
+
     /**
      * Simple constructor, used in Game.newInstance.
      *
      * @param game The enclosing {@code Game}.
-     * @param id The identifier (ignored).
+     *
      */
     public NativeRecruit(Game game, String id) {
         super(game, id);
@@ -128,6 +126,7 @@ public class NativeRecruit extends FreeColGameObject {
      *
      * @param unit The {@code Unit} that is trading.
      * @param nativeUnit The {@code IndianSettlement} to trade with.
+     *
      */
     public NativeRecruit(Unit unit, Unit nativeUnit) {
         this(unit.getGame(), ""); // Identifier not needed
@@ -307,6 +306,10 @@ public class NativeRecruit extends FreeColGameObject {
         return this.nativeUnit;
     }
 
+    public Unit setUnitToRecruit(Unit unit) {
+        return this.nativeUnit = unit;
+    }
+
     /**
      * Get the list of items the unit is able to offer the unit.
      * to recruit or to gift to the native unit.
@@ -327,15 +330,6 @@ public class NativeRecruit extends FreeColGameObject {
      */
     public void addToUnit(NativeTradeItem nti) {
         this.unitToNativeSettlement.add(nti);
-    }
-
-    /**
-     * Remove an item from the unit list of items.
-     *
-     * @param nti The {@code NativeTradeItem} to remove.
-     */
-    public void removeFromUnit(NativeTradeItem nti) {
-        removeInPlace(this.unitToNativeSettlement, nti.goodsMatcher());
     }
 
     /**
@@ -388,6 +382,8 @@ public class NativeRecruit extends FreeColGameObject {
             this.item = nt.getItem();
         }
     }
+
+
 
     /**
      * Choose the next available upward haggling price.

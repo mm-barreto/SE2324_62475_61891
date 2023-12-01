@@ -33,16 +33,13 @@ import static net.sf.freecol.common.util.Utils.deleteFile;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.Map;
+
 import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -66,23 +63,25 @@ import net.sf.freecol.common.model.Constants.MissionaryAction;
 import net.sf.freecol.common.model.Constants.ScoutColonyAction;
 import net.sf.freecol.common.model.Constants.ScoutIndianSettlementAction;
 import net.sf.freecol.common.model.Constants.TradeAction;
+import net.sf.freecol.common.model.Constants.NativeRecruitInteractionAction;
+import net.sf.freecol.common.model.Constants.NativeRecruitAction;
 import net.sf.freecol.common.model.Constants.TradeBuyAction;
 import net.sf.freecol.common.model.Constants.TradeSellAction;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
 import net.sf.freecol.common.model.Europe.MigrationType;
 import net.sf.freecol.common.model.Game.LogoutReason;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
 import net.sf.freecol.common.model.Player.NoClaimReason;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.option.GameOptions;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.server.FreeColServer;
+
+import net.sf.freecol.common.model.Map;
 
 
 /**
@@ -4305,70 +4304,57 @@ public final class InGameController extends FreeColClientHolder {
      *
      **/
 
-    private void nativeRecruit(NativeRecruit nt, NativeRecruitAction act,
-                               NativeTradeItem nti, StringTemplate prompt) {
-        final Unit nativeUnit = nt.getNativeUnit();
-        final Unit unit = nt.getUnit();
+    private void nativeRecruit(NativeRecruit nr, NativeRecruitInteractionAction act,
+                               UnitRecruitable unr, StringTemplate prompt) {
+        final Unit nativeUnit = nr.getNativeUnit();
+        final Unit unit = nr.getUnit();
         final StringTemplate base = StringTemplate
                 .template("trade.welcome")
                 .addStringTemplate("%nation%", nativeUnit.getOwner().getNationLabel())
-                .addStringTemplate("%settlement%", nativeUnit.getLocationLabelFor(unit.getOwner()));
+                .addStringTemplate("%native%", nativeUnit.getLabel());
 
         // here the settlement won't offer items, it will be the native unit to be recruited
 
-        while (!nt.getDone()) {
+
+        while (!nr.getDone()) {
             if (act == null) {
                 if (prompt == null) prompt = base;
-                act = getGUI().getIndianSettlementRecruitChoice(, prompt,
-                        nt.canRecruit(), nt.canGift());
+                act = getGUI().getRecruitTradeChoice(nativeUnit, prompt,
+                        nr.canRecruit(), nr.canGift());
                 if (act == null) break;
                 prompt = base; // Revert to base after first time through
             }
             switch (act) {
                 case RECRUIT:
                     act = null;
-                    if (nti == null) {
-                        nti = getGUI().getChoice(unit.getTile(),
-                                StringTemplate.key("buyProposition.text"),
-                                is, "nothing",
-                                transform(nt.getSettlementToUnit(),
-                                        NativeTradeItem::priceIsValid, goodsMapper));
-                        if (nti == null) break;
-                        nt.setItem(nti);
+
+                    UnitRecruitable toRecruit = new UnitRecruitable(getGame(), nativeUnit.getOwner(), unit.getOwner(), nativeUnit);
+                    List<ChoiceItem<UnitRecruitable>> recruitableList = new ArrayList<>();
+                    recruitableList.add(new ChoiceItem<UnitRecruitable>(toRecruit));
+
+                    if (unr == null) {
+                        unr = getGUI().getChoice(unit.getTile(),
+                                StringTemplate.key("recruitProposition.text"),
+                                nativeUnit, "nothing", recruitableList);
+                        if (unr == null) break;
+                        nr.setUnitToRecruit(nativeUnit);
                     }
-                    TradeBuyAction tba = getGUI().getBuyChoice(unit, is,
-                            nti.getGoods(), nti.getPrice(),
-                            unit.getOwner().checkGold(nti.getPrice()));
-                    if (tba == TradeBuyAction.BUY) {
-                        askServer().nativeTrade(NativeTradeAction.BUY, nt);
+
+                    int price = unr.getUnitPrice(nativeUnit.getOwner(), nativeUnit);
+
+                    NativeRecruitAction nra = getGUI().getNativeRecruitChoice(unit, nativeUnit,
+                            unr.getUnit().getType(), price,
+                            unit.getOwner().checkGold(price));
+
+                    if (nra == NativeRecruitAction.ACCEPT) {
+                        askServer().nativeRecruit(NativeRecruitInteractionAction.RECRUIT, nr);
                         return;
-                    } else if (tba == TradeBuyAction.HAGGLE) {
-                        nti.setPrice(NativeTradeItem.PRICE_UNSET);
-                        askServer().nativeTrade(NativeTradeAction.BUY, nt);
-                        return;
-                    }
-                    break;
-                case SELL:
-                    act = null;
-                    if (nti == null) {
-                        nti = getGUI().getChoice(unit.getTile(),
-                                StringTemplate.key("sellProposition.text"),
-                                is, "nothing",
-                                transform(nt.getUnitToSettlement(),
-                                        NativeTradeItem::priceIsValid, goodsMapper));
-                        if (nti == null) break;
-                        nt.setItem(nti);
-                    }
-                    TradeSellAction tsa = getGUI().getSellChoice(unit, is,
-                            nti.getGoods(), nti.getPrice());
-                    if (tsa == TradeSellAction.SELL) {
-                        askServer().nativeTrade(NativeTradeAction.SELL, nt);
-                        return;
-                    } else if (tsa == TradeSellAction.HAGGLE) {
-                        nti.setPrice(NativeTradeItem.PRICE_UNSET);
-                        askServer().nativeTrade(NativeTradeAction.SELL, nt);
+                    } else if (nra == NativeRecruitAction.HAGGLE) {
+                        unr.setPrice(NativeTradeItem.PRICE_UNSET);
+                        askServer().nativeRecruit(NativeRecruitInteractionAction.RECRUIT, nr);
                         return;
                     }
+
                     break;
                 case GIFT:
                     act = null;
