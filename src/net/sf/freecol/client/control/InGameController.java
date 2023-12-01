@@ -1970,6 +1970,7 @@ public final class InGameController extends FreeColClientHolder {
                 //event triggered no more events in this river tile
                 //tile.setTriggerEvent();
         }
+        /**Start here**/
         //when this event is triggered you either get gold or a unit is added in Europe
         //the chance of getting gold is 95%
         //the chance of getting a unit is 5%
@@ -1979,7 +1980,7 @@ public final class InGameController extends FreeColClientHolder {
 
             if (unit.getTile().getTriggerEvent()) {
 
-                if (Math.random() > 0.60) {
+                if (Math.random() > 0.85) {
                     //add gold
 
                     int gold = (int) (Math.random() * 145);
