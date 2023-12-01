@@ -1971,33 +1971,35 @@ public final class InGameController extends FreeColClientHolder {
         if (unit.getTile().hasRiver()) {
             System.out.println("river");
 
+            if (unit.getTile().getTriggerEvent()) {
 
+                if (Math.random() < 0.95) {
+                    //add gold
+                    System.out.println("gold event");
 
-            if (Math.random() < 0.95) {
-                //add gold
-                System.out.println("gold event");
+                    int gold = (int) (Math.random() * 250);
+                    unit.getOwner().modifyGold(gold);
+                } else {
+                    System.out.println("river add unit event");
 
-                int gold = (int) (Math.random() * 250);
-                unit.getOwner().modifyGold(gold);
-            } else {
-                System.out.println("river add unit event");
+                    Unit newUnit = new Unit(getGame(), "");
 
-                Unit newUnit = new Unit(getGame(), "");
+                    double randExpertise = Math.random();
+                    double randType = Math.random();
+                    /**
+                     * add a unit to Europe
+                     *
+                     * use of a random number to determine the type of unit
+                     *
+                     */
+                    newUnit.setType(getType(randExpertise, randType));
 
-                double randExpertise = Math.random();
-                double randType = Math.random();
-                /**
-                 * add a unit to Europe
-                 *
-                 * use of a random number to determine the type of unit
-                 *
-                 */
-                newUnit.setType(getType(randExpertise, randType));
-
-                newUnit.setOwner(unit.getOwner());
-                newUnit.setLocation(unit.getOwner().getEurope());
-                newUnit.setMovesLeft(0);
+                    newUnit.setOwner(unit.getOwner());
+                    newUnit.setLocation(unit.getOwner().getEurope());
+                    newUnit.setMovesLeft(0);
+                }
             }
+            unit.getTile().setTriggerEvent();
         }
         return ret && !discover;
     }
