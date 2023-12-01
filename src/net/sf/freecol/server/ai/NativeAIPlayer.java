@@ -35,29 +35,9 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
-import net.sf.freecol.common.model.FeatureContainer;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.NativeTradeItem;
-import net.sf.freecol.common.model.Ownable;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Role;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.option.GameOptions;
@@ -950,6 +930,11 @@ public final class NativeAIPlayer extends MissionAIPlayer {
         default: // Invalid
             return NativeTradeAction.NAK_INVALID;
         }
+    }
+
+    @Override
+    public NativeRecruit.NativeRecruitAction handleTrade(NativeRecruit.NativeRecruitAction action, NativeRecruit nt) {
+        return null;
     }
 
     /**

@@ -1964,43 +1964,39 @@ public final class InGameController extends FreeColClientHolder {
             } else {
                 ; // Automatic movement can continue after successful move.
             }
-
-            //when this event is triggered you either get gold or a unit is added in Europe
-            if (tile.isRiverCorner()) {
-                if (tile.getTriggerEvent()) {
-                    System.out.println("river corner");
-
-                    if (Math.random() < 0.95) {
-                        //add gold
-                        System.out.println("gold event");
-
-                        int gold = (int) (Math.random() * 250);
-                        unit.getOwner().modifyGold(gold);
-                    } else {
-                        sound("sound.event.river");
-                        System.out.println("river add unit event");
-
-                        //add unit to Europe
-                        UnitType Type = getSpecification().getUnitType("model.unit.colonizer");
-                        Unit newUnit = new Unit(getGame(), "");
-
-                        double randExpertise = Math.random();
-                        double randType = Math.random();
-                        /**
-                         * add a unit to Europe
-                         *
-                         * use of a random number to determine the type of unit
-                         *
-                         */
-                        newUnit.setType(getType(randExpertise, randType));
-
-                        newUnit.setOwner(unit.getOwner());
-                        newUnit.setLocation(unit.getOwner().getEurope());
-                        newUnit.setMovesLeft(0);
-                    }
-                }
                 //event triggered no more events in this river tile
-                tile.setTriggerEvent();
+                //tile.setTriggerEvent();
+        }
+        //when this event is triggered you either get gold or a unit is added in Europe
+        if (unit.getTile().hasRiver()) {
+            System.out.println("river");
+
+
+
+            if (Math.random() < 0.95) {
+                //add gold
+                System.out.println("gold event");
+
+                int gold = (int) (Math.random() * 250);
+                unit.getOwner().modifyGold(gold);
+            } else {
+                System.out.println("river add unit event");
+
+                Unit newUnit = new Unit(getGame(), "");
+
+                double randExpertise = Math.random();
+                double randType = Math.random();
+                /**
+                 * add a unit to Europe
+                 *
+                 * use of a random number to determine the type of unit
+                 *
+                 */
+                newUnit.setType(getType(randExpertise, randType));
+
+                newUnit.setOwner(unit.getOwner());
+                newUnit.setLocation(unit.getOwner().getEurope());
+                newUnit.setMovesLeft(0);
             }
         }
         return ret && !discover;
