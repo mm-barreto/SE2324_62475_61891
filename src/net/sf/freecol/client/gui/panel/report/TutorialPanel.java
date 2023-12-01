@@ -54,7 +54,7 @@ public class TutorialPanel extends ReportPanel {
         settleMission2.setFont(font);
         reportPanel.add(settleMission2, SPAN_SPLIT_2);
 
-        JLabel settleMission2Description = new JLabel("Disembark an unit.");
+        JLabel settleMission2Description = new JLabel("Disembark a unit.");
         if(player.gethasDisembarked()){
             counter++;
             settleMission2Description.setForeground(Color.GREEN);

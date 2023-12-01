@@ -1975,102 +1975,53 @@ public final class InGameController extends FreeColClientHolder {
         //the chance of getting a unit is 5%
         //send a message to the player that this event has been triggered
         if (unit.getTile().hasRiver()) {
-            System.out.println("river");
+            //System.out.println("river");
 
             if (unit.getTile().getTriggerEvent()) {
 
-                if (Math.random() < 0.3) {
-                    System.out.println("EVENT: Nothing Happens");
-
-                    //getGUI().("You have found " + fish + " fish in the river!");
-                    //showEventPanel("Event triggered", unit.getLocationImageKey(),"You have found " + gold + " gold in the river!");
-
-                } else if (Math.random() < 0.35) {
+                if (Math.random() > 0.60) {
                     //add gold
-                    System.out.println("EVENT: gold event");
 
-                    int gold = (int) (Math.random() * 100);
+                    int gold = (int) (Math.random() * 145);
                     unit.getOwner().modifyGold(gold);
 
                     //getGUI().("You have found " + gold + " gold in the river!");
-                    showEventPanel("Event triggered", unit.getLocationImageKey(),"You have found " + gold + " gold in the river!");
-                } else {
-                    System.out.println("EVENT: river add unit event");
-
-                    /**
-                     * add a unit to Europe
-                     *
-                     * use of a random number to determine the type of unit
-                     *
-                     */
-
-                    double randExpertise = Math.random();
-                    double randType = Math.random();
-
-                    Player owner = unit.getOwner();
-
-                    //add unit
-                    UnitType type = getType(randExpertise, randType);
-                    //String id = unit.getOwner().getId() + " " + type.toString() + " " + unit.getOwner().getUnits().count();
-                    /**Unit newUnit = new Unit(getGame(), "");
-
-                    newUnit.setType(type);
-
-                    newUnit.setOwner(owner);
-                    newUnit.setLocation(unit.getTile());
-                    newUnit.setMovesLeft(0);
-
-                    owner.addUnit(newUnit);
-                     **/
-                    Unit newUnit = new ServerUnit(getGame(), owner.getEurope(), owner, type);
-
-                    showEventPanel("Event triggered", "","A new unit has appeared in Europe.\n" + newUnit.getName() + " " + newUnit.getType() + "\nHe is at the port waiting for orders");
-
+                    showEventPanel("Event triggered", "", "You have found " + gold + " gold in the river!");
                 }
-                unit.getTile().setTriggerEvent();
             }
-
         }
         return ret && !discover;
     }
 
-    private UnitType getType(double randExpertise, double randType) {
+    /**
+    private UnitType getType() {
+
+        double randExpertise = Math.random();
+        double randType = Math.random();
+
         if (randExpertise >= 0.7) {
-            //expert farmer
-            if (randType <= 0.12)
-                return getSpecification().getUnitType("model.unit.expertFarmer");
-            else if (randType <= 0.24)
-                return getSpecification().getUnitType("model.unit.expertLumberjack");
-            else if (randType <= 0.36)
-                return getSpecification().getUnitType("model.unit.masterCottonPlanter");
-            else if (randType <= 0.48)
-                return getSpecification().getUnitType("model.unit.expertFisherman");
-            else if (randType <= 0.60)
-                return getSpecification().getUnitType("model.unit.expertFurTrapper");
-            else if (randType <= 0.72)
-                return getSpecification().getUnitType("model.unit.expertSilverMiner");
-            else if (randType <= 0.84)
-                return getSpecification().getUnitType("model.unit.masterBlacksmith");
-            else if (randType <= 0.96)
-                return getSpecification().getUnitType("model.unit.expertOreMiner");
-            else
-            return getSpecification().getUnitType("model.unit.frigate");
+            //experts
+            if (randType <= 0.12) return getSpecification().getUnitType("model.unit.expertFarmer");
+            else if (randType <= 0.24) return getSpecification().getUnitType("model.unit.expertLumberjack");
+            else if (randType <= 0.36) return getSpecification().getUnitType("model.unit.masterCottonPlanter");
+            else if (randType <= 0.48) return getSpecification().getUnitType("model.unit.expertFisherman");
+            else if (randType <= 0.60) return getSpecification().getUnitType("model.unit.expertFurTrapper");
+            else if (randType <= 0.72) return getSpecification().getUnitType("model.unit.expertSilverMiner");
+            else if (randType <= 0.84) return getSpecification().getUnitType("model.unit.masterBlacksmith");
+            else if (randType <= 0.96) return getSpecification().getUnitType("model.unit.expertOreMiner");
+            else return getSpecification().getUnitType("model.unit.frigate");
 
         } else {
-            if (randType <= 0.1985)
-                return getSpecification().getUnitType("model.unit.freeColonist");
-            else if (randType <= 0.397)
-                return getSpecification().getUnitType("model.unit.soldier");
-            else if (randType <= 0.5955)
-                return getSpecification().getUnitType("model.unit.pettyCriminal");
-            else if (randType <= 0.794)
-                return getSpecification().getUnitType("model.unit.indenturedServant");
-            else if (randType <= 0.9925)
-                return getSpecification().getUnitType("model.unit.IndianConvert");
-            else
-                return getSpecification().getUnitType("model.unit.caravel");
+            //non-experts
+            if (randType <= 0.1985) return getSpecification().getUnitType("model.unit.freeColonist");
+            else if (randType <= 0.397) return getSpecification().getUnitType("model.unit.soldier");
+            else if (randType <= 0.5955) return getSpecification().getUnitType("model.unit.pettyCriminal");
+            else if (randType <= 0.794) return getSpecification().getUnitType("model.unit.indenturedServant");
+            else if (randType <= 0.9925) return getSpecification().getUnitType("model.unit.IndianConvert");
+            else return getSpecification().getUnitType("model.unit.caravel");
+
         }
-    }
+    }**/
 
 
     /**
@@ -5406,6 +5357,26 @@ public final class InGameController extends FreeColClientHolder {
             showInformationPanel(null, "info.notEnoughGold");
             return false;
         }
+
+        EuropeWas europeWas = new EuropeWas(europe);
+        Unit newUnit = null;
+        boolean ret = askServer().trainUnitInEurope(unitType)
+                && (newUnit = europeWas.getNewUnit()) != null;
+        if (ret) {
+            fireChanges(europeWas);
+            changeView(newUnit, false);
+            updateGUI(null, false);
+        }
+        return ret;
+    }
+
+    public boolean trainUnitInEuropeFree(UnitType unitType) {
+        if (!requireOurTurn() || unitType == null) return false;
+
+        final Player player = getMyPlayer();
+        final Europe europe = player.getEurope();
+
+        player.modifyGold(europe.getUnitPrice(unitType)+1);
 
         EuropeWas europeWas = new EuropeWas(europe);
         Unit newUnit = null;
