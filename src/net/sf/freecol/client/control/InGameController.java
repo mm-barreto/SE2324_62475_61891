@@ -4346,17 +4346,14 @@ public final class InGameController extends FreeColClientHolder {
                             unr.getUnit().getType(), price,
                             unit.getOwner().checkGold(price));
 
-                    if (nra == NativeRecruitAction.ACCEPT) {
-                        askServer().nativeRecruit(NativeRecruitInteractionAction.RECRUIT, nr);
-                        return;
-                    } else if (nra == NativeRecruitAction.HAGGLE) {
-                        unr.setPrice(NativeTradeItem.PRICE_UNSET);
+                    if (nra == NativeRecruitAction.RECRUIT_ACCEPT) {
                         askServer().nativeRecruit(NativeRecruitInteractionAction.RECRUIT, nr);
                         return;
                     }
 
                     break;
                 case GIFT:
+                    /**
                     act = null;
                     nti = getGUI().getChoice(unit.getTile(),
                             StringTemplate.key("gift.text"),
@@ -4373,9 +4370,11 @@ public final class InGameController extends FreeColClientHolder {
                     logger.warning("showIndianSettlementTradeDialog fail: "
                             + act);
                     nt.setDone();
+                     */
+                    System.out.println("gifting");
                     break;
             }
-            nti = null;
+            unr = null;
         }
 
     }

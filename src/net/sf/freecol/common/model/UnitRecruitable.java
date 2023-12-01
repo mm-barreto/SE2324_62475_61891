@@ -178,4 +178,8 @@ public class UnitRecruitable extends Recruitable {
                 .append(' ').append(unit.getName()).append(']');
         return sb.toString();
     }
+
+    public void setPrice(int price){
+        this.price = price;
+    }
 }

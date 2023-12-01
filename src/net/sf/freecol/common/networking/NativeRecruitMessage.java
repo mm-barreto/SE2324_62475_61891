@@ -1,14 +1,21 @@
 package net.sf.freecol.common.networking;
 
 import net.sf.freecol.common.io.FreeColXMLReader;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
+import net.sf.freecol.common.model.NativeRecruit;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.NativeRecruit;
 import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.Unit;
+
+import javax.xml.stream.XMLStreamException;
+
 import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
-
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -48,7 +55,22 @@ public class NativeRecruitMessage extends ObjectMessage {
      * @param nt The {@code NativeRecruit}
      *           unit, nativeUnit
      */
-    public NativeRecruitMessage(NativeRecruit.NativeRecruitAction action, NativeRecruit nt) {
+    public NativeRecruitMessage(NativeRecruitAction action, NativeRecruit nt) {
+        super(TAG, ACTION_TAG, action.toString());
+
+        appendChild(nt);
+    }
+
+    /**
+     * Create a new {@code NativeRecruitMessage} with the
+     * supplied unit and nativeUnit.
+     *
+     * @param action The {@code NativeRecruitAction}
+     *               OPEN, ACCEPT, REJECT, CANCEL
+     * @param nt The {@code NativeRecruit}
+     *           unit, nativeUnit
+     */
+    public NativeRecruitMessage(Constants.NativeRecruitInteractionAction action, NativeRecruit nt) {
         super(TAG, ACTION_TAG, action.toString());
 
         appendChild(nt);

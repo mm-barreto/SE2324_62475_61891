@@ -166,7 +166,6 @@ public interface Constants {
     }
 
     public static enum NativeRecruitAction {
-        ACCEPT,
-        HAGGLE
+        RECRUIT_ACCEPT,
     }
 }

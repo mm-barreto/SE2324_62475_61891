@@ -69,7 +69,34 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-
+import net.sf.freecol.common.model.DiplomaticTrade;
+import net.sf.freecol.common.model.Direction;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianNationType;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TypeCountMap;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * The API and common reusable functionality for the overall GUI.
@@ -504,9 +531,11 @@ public class GUI extends FreeColClientHolder {
 
         List<ChoiceItem<NativeRecruitAction>> choices = new ArrayList<>();
         choices.add(new ChoiceItem<>(Messages.message("nativeRecruit.takeOffer"),
-                                     NativeRecruitAction.ACCEPT, canBuy));
+                                     NativeRecruitAction.RECRUIT_ACCEPT, canBuy));
+        /**
         choices.add(new ChoiceItem<>(Messages.message("nativeRecruit.moreGold"),
                                      NativeRecruitAction.HAGGLE));
+         **/
 
         return getChoice(nativeUnit.getTile(), template,
                 nativeUnit, "cancel", choices);

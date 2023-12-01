@@ -29,19 +29,32 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
+import net.sf.freecol.common.model.Game.LogoutReason;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.NationOptions.NationState;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.option.OptionGroup;
+
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Constants.IndianDemandAction;
+
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.Game.LogoutReason;
+
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
+
+import net.sf.freecol.common.model.Constants.IndianDemandAction;
+import net.sf.freecol.common.model.Game.LogoutReason;
+
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions.NationState;
@@ -1077,5 +1090,9 @@ public abstract class ServerAPI {
 
     public void nativeUnitTrade(Unit unit, Unit nativeUnit) {
         send(new NativeRecruitMessage(unit, nativeUnit));
+    }
+
+    public void nativeRecruit(Constants.NativeRecruitInteractionAction nativeRecruitInteractionAction, NativeRecruit nr) {
+        send(new NativeRecruitMessage(nativeRecruitInteractionAction, nr));
     }
 }
