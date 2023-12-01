@@ -9,7 +9,7 @@
 
 # SE Project fork changes made by
 - Miguel Barreto 61891 mm-barreto
-- Diogo Correia 62475 
+- Diogo Correia 62475 Correia21
   
 # FreeCol - Colonization Strategy Game
 
