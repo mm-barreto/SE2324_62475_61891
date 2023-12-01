@@ -146,7 +146,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
-
+import net.sf.freecol.server.model.ServerUnit;
 
 
 /**
@@ -1980,14 +1980,14 @@ public final class InGameController extends FreeColClientHolder {
             if (unit.getTile().getTriggerEvent()) {
 
                 if (Math.random() < 0.3) {
-                    System.out.println("Nothing Happens");
+                    System.out.println("EVENT: Nothing Happens");
 
                     //getGUI().("You have found " + fish + " fish in the river!");
                     //showEventPanel("Event triggered", unit.getLocationImageKey(),"You have found " + gold + " gold in the river!");
 
-                } if (Math.random() < 0.95) {
+                } else if (Math.random() < 0.35) {
                     //add gold
-                    System.out.println("gold event");
+                    System.out.println("EVENT: gold event");
 
                     int gold = (int) (Math.random() * 100);
                     unit.getOwner().modifyGold(gold);
@@ -1995,26 +1995,41 @@ public final class InGameController extends FreeColClientHolder {
                     //getGUI().("You have found " + gold + " gold in the river!");
                     showEventPanel("Event triggered", unit.getLocationImageKey(),"You have found " + gold + " gold in the river!");
                 } else {
-                    System.out.println("river add unit event");
+                    System.out.println("EVENT: river add unit event");
 
-                    Unit newUnit = new Unit(getGame(), "");
-
-                    double randExpertise = Math.random();
-                    double randType = Math.random();
                     /**
                      * add a unit to Europe
                      *
                      * use of a random number to determine the type of unit
                      *
                      */
-                    newUnit.setType(getType(randExpertise, randType));
 
-                    newUnit.setOwner(unit.getOwner());
-                    newUnit.setLocation(unit.getOwner().getEurope());
+                    double randExpertise = Math.random();
+                    double randType = Math.random();
+
+                    Player owner = unit.getOwner();
+
+                    //add unit
+                    UnitType type = getType(randExpertise, randType);
+                    //String id = unit.getOwner().getId() + " " + type.toString() + " " + unit.getOwner().getUnits().count();
+                    /**Unit newUnit = new Unit(getGame(), "");
+
+                    newUnit.setType(type);
+
+                    newUnit.setOwner(owner);
+                    newUnit.setLocation(unit.getTile());
                     newUnit.setMovesLeft(0);
+
+                    owner.addUnit(newUnit);
+                     **/
+                    Unit newUnit = new ServerUnit(getGame(), owner.getEurope(), owner, type);
+
+                    showEventPanel("Event triggered", "","A new unit has appeared in Europe.\n" + newUnit.getName() + " " + newUnit.getType() + "\nHe is at the port waiting for orders");
+
                 }
+                unit.getTile().setTriggerEvent();
             }
-            unit.getTile().setTriggerEvent();
+
         }
         return ret && !discover;
     }
