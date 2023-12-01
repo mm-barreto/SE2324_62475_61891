@@ -52,9 +52,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.debug.FreeColDebugger;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.metaserver.ServerInfo;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.*;
 // Imports all ENUMS.
 import net.sf.freecol.common.model.Constants.ArmedUnitSettlementAction;
 import net.sf.freecol.common.model.Constants.BoycottAction;
@@ -63,8 +61,14 @@ import net.sf.freecol.common.model.Constants.MissionaryAction;
 import net.sf.freecol.common.model.Constants.ScoutColonyAction;
 import net.sf.freecol.common.model.Constants.ScoutIndianSettlementAction;
 import net.sf.freecol.common.model.Constants.TradeAction;
+import net.sf.freecol.common.model.Constants.NativeRecruitInteractionAction;
+import net.sf.freecol.common.model.Constants.NativeRecruitAction;
 import net.sf.freecol.common.model.Constants.TradeBuyAction;
 import net.sf.freecol.common.model.Constants.TradeSellAction;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.Direction;
 import net.sf.freecol.common.model.Europe;
@@ -79,7 +83,6 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationSummary;
 import net.sf.freecol.common.model.PathNode;
@@ -94,10 +97,13 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.resources.ResourceManager;
-
 
 /**
  * The API and common reusable functionality for the overall GUI.
@@ -516,6 +522,34 @@ public class GUI extends FreeColClientHolder {
     }
 
     /**
+     * Gets the user choice when recruiting a Native
+     *
+     *
+     */
+    public NativeRecruitAction getNativeRecruitChoice(Unit unit, Unit nativeUnit,
+                                                                UnitType unitType, int gold, boolean canBuy) {
+
+
+        StringTemplate nation = nativeUnit.getOwner().getNationLabel();
+        StringTemplate template = StringTemplate.template("nativeRecruit.text")
+            .addStringTemplate("%nation%", nation)
+            .addStringTemplate("%unit%", unit.getLabel())
+            .addAmount("%gold%", gold);
+
+        List<ChoiceItem<NativeRecruitAction>> choices = new ArrayList<>();
+        choices.add(new ChoiceItem<>(Messages.message("nativeRecruit.takeOffer"),
+                                     NativeRecruitAction.RECRUIT_ACCEPT, canBuy));
+        /**
+        choices.add(new ChoiceItem<>(Messages.message("nativeRecruit.moreGold"),
+                                     NativeRecruitAction.HAGGLE));
+         **/
+
+        return getChoice(nativeUnit.getTile(), template,
+                nativeUnit, "cancel", choices);
+    }
+
+
+    /**
      * General modal choice dialog.
      *
      * @param <T> The choice type.
@@ -682,35 +716,31 @@ public class GUI extends FreeColClientHolder {
     /**
      * Get the user choice when recruiting a native unit.
      *
-     * @param settlement The native unit owner to trade with.
+     * @param nativeUnit The native unit owner to trade with.
      * @param template A {@code StringTemplate} containing the message
      *     to display.
      * @param canRecruit Show a "recruit" option.
      * @param canGift Show a "gift" option.
      * @return The chosen action, buy, sell, gift or cancel.
      */
-    public TradeAction getIndianSettlementRecruitChoice(Settlement settlement,
-                                                      StringTemplate template,
-                                                      boolean canRecruit,
-                                                      boolean canGift) {
+    public NativeRecruitInteractionAction getRecruitTradeChoice(Unit nativeUnit,
+                                                                StringTemplate template,
+                                                                boolean canRecruit,
+                                                                boolean canGift) {
         String msg;
-        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<>();
-        if (canBuy) {
-            msg = Messages.message("tradeProposition.toBuy");
-            choices.add(new ChoiceItem<>(msg, TradeAction.BUY, canBuy));
-        }
-        if (canSell) {
-            msg = Messages.message("tradeProposition.toSell");
-            choices.add(new ChoiceItem<>(msg, TradeAction.SELL, canSell));
+        ArrayList<ChoiceItem<NativeRecruitInteractionAction>> choices = new ArrayList<>();
+        if (canRecruit) {
+            msg = Messages.message("tradeProposition.toRecruit");
+            choices.add(new ChoiceItem<>(msg, NativeRecruitInteractionAction.RECRUIT, canRecruit));
         }
         if (canGift) {
             msg = Messages.message("tradeProposition.toGift");
-            choices.add(new ChoiceItem<>(msg, TradeAction.GIFT, canGift));
+            choices.add(new ChoiceItem<>(msg, NativeRecruitInteractionAction.GIFT, canGift));
         }
         if (choices.isEmpty()) return null;
 
-        return getChoice(settlement.getTile(), template,
-                settlement, "cancel", choices);
+        return getChoice(nativeUnit.getTile(), template,
+                nativeUnit, "cancel", choices);
     }
 
     /**

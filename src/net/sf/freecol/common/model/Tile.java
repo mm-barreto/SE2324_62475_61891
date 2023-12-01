@@ -76,6 +76,8 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     public static final String TAG = "tile";
 
+
+
     /** Comparator to sort tiles by increasing distance from the edge. */
     public static final Comparator<Tile> edgeDistanceComparator
         = Comparator.comparingInt(Tile::getEdgeDistance);
@@ -231,6 +233,15 @@ public final class Tile extends UnitLocation implements Named, Ownable {
      */
     private final java.util.Map<Player, IndianSettlementInternals> playerIndianSettlements;
 
+    public boolean eventTriggered = false;
+
+    public void setTriggerEvent() {
+        eventTriggered = true;
+    }
+
+    public boolean getTriggerEvent() {
+        return !eventTriggered;
+    }
 
     /**
      * The main tile constructor.
@@ -248,6 +259,7 @@ public final class Tile extends UnitLocation implements Named, Ownable {
         this.y = locY;
         this.owningSettlement = null;
         this.settlement = null;
+        this.eventTriggered = false;
 
         if (game.isInServer()) {
             this.cachedTiles = new HashMap<>();

@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.StringTemplate;
 import static net.sf.freecol.common.util.CollectionUtils.*;
+import net.sf.freecol.client.control.InGameController;
 
 
 /**

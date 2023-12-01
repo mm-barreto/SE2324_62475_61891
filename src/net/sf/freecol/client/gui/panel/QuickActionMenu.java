@@ -70,6 +70,7 @@ import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.GameOptions;
 import static net.sf.freecol.common.util.CollectionUtils.*;
 import static net.sf.freecol.common.util.StringUtils.*;
+import net.sf.freecol.client.control.InGameController;
 
 
 /**
