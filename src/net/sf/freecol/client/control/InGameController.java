@@ -25,6 +25,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ChoiceItem;
 import net.sf.freecol.client.gui.DialogHandler;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.report.ReportHistoryPanel;
@@ -1978,14 +1979,21 @@ public final class InGameController extends FreeColClientHolder {
 
             if (unit.getTile().getTriggerEvent()) {
 
-                if (Math.random() < 0.95) {
+                if (Math.random() < 0.3) {
+                    System.out.println("Nothing Happens");
+
+                    //getGUI().("You have found " + fish + " fish in the river!");
+                    //showEventPanel("Event triggered", unit.getLocationImageKey(),"You have found " + gold + " gold in the river!");
+
+                } if (Math.random() < 0.95) {
                     //add gold
                     System.out.println("gold event");
 
-                    int gold = (int) (Math.random() * 250);
+                    int gold = (int) (Math.random() * 100);
                     unit.getOwner().modifyGold(gold);
 
                     //getGUI().("You have found " + gold + " gold in the river!");
+                    showEventPanel("Event triggered", unit.getLocationImageKey(),"You have found " + gold + " gold in the river!");
                 } else {
                     System.out.println("river add unit event");
 
