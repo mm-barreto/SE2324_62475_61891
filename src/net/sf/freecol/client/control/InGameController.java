@@ -1,45 +1,23 @@
 /**
- *  Copyright (C) 2002-2022   The FreeCol Team
- *
- *  This file is part of FreeCol.
- *
- *  FreeCol is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  FreeCol is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2002-2022   The FreeCol Team
+ * <p>
+ * This file is part of FreeCol.
+ * <p>
+ * FreeCol is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * FreeCol is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package net.sf.freecol.client.control;
-
-import static net.sf.freecol.common.model.Constants.INFINITY;
-import static net.sf.freecol.common.model.Constants.STEAL_LAND;
-import static net.sf.freecol.common.util.CollectionUtils.allSame;
-import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
-import static net.sf.freecol.common.util.CollectionUtils.find;
-import static net.sf.freecol.common.util.CollectionUtils.none;
-import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
-import static net.sf.freecol.common.util.CollectionUtils.transform;
-import static net.sf.freecol.common.util.Utils.delay;
-import static net.sf.freecol.common.util.Utils.deleteFile;
-
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
@@ -56,6 +34,57 @@ import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.i18n.NameCache;
 import net.sf.freecol.common.io.FreeColDirectories;
 import net.sf.freecol.common.model.*;
+import net.sf.freecol.common.model.Constants.*;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
+import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
+import net.sf.freecol.common.model.Europe.MigrationType;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Game.LogoutReason;
+import net.sf.freecol.common.model.ModelMessage.MessageType;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
+import net.sf.freecol.common.model.Player.NoClaimReason;
+import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.option.GameOptions;
+import net.sf.freecol.common.util.Introspector;
+import net.sf.freecol.common.util.LogBuilder;
+import net.sf.freecol.server.FreeColServer;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static net.sf.freecol.common.model.Constants.*;
+import static net.sf.freecol.common.util.CollectionUtils.*;
+import static net.sf.freecol.common.util.Utils.delay;
+import static net.sf.freecol.common.util.Utils.deleteFile;
+
+
+import static net.sf.freecol.common.model.Constants.INFINITY;
+import static net.sf.freecol.common.model.Constants.STEAL_LAND;
+import static net.sf.freecol.common.util.CollectionUtils.allSame;
+import static net.sf.freecol.common.util.CollectionUtils.alwaysTrue;
+import static net.sf.freecol.common.util.CollectionUtils.find;
+import static net.sf.freecol.common.util.CollectionUtils.none;
+import static net.sf.freecol.common.util.CollectionUtils.removeInPlace;
+import static net.sf.freecol.common.util.CollectionUtils.transform;
+import static net.sf.freecol.common.util.Utils.delay;
+import static net.sf.freecol.common.util.Utils.deleteFile;
+import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.freecol.common.model.Constants.ArmedUnitSettlementAction;
 import net.sf.freecol.common.model.Constants.ClaimAction;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
@@ -67,33 +96,7 @@ import net.sf.freecol.common.model.Constants.NativeRecruitInteractionAction;
 import net.sf.freecol.common.model.Constants.NativeRecruitAction;
 import net.sf.freecol.common.model.Constants.TradeBuyAction;
 import net.sf.freecol.common.model.Constants.TradeSellAction;
-import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
-import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.Europe.MigrationType;
-import net.sf.freecol.common.model.Game.LogoutReason;
-import net.sf.freecol.common.model.ModelMessage.MessageType;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.Player.NoClaimReason;
-import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.option.GameOptions;
-import net.sf.freecol.common.util.Introspector;
-import net.sf.freecol.common.util.LogBuilder;
-import net.sf.freecol.server.FreeColServer;
 
-import net.sf.freecol.common.model.Map;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import javax.swing.SwingUtilities;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractGoods;
-import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyWas;
@@ -140,6 +143,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitWas;
 import net.sf.freecol.common.model.WorkLocation;
+
 
 
 /**
@@ -374,7 +378,7 @@ public final class InGameController extends FreeColClientHolder {
                         (Integer value) -> { // Value is a valid slot
                             emigrate(player,
                                     Europe.MigrationType.convertToMigrantSlot(value),
-                                    n-1, foy);
+                                    n - 1, foy);
                         }));
     }
 
@@ -431,7 +435,8 @@ public final class InGameController extends FreeColClientHolder {
                     canEstablish, canDenounce);
             if (act == null) return;
             switch (act) {
-                case MISSIONARY_ESTABLISH_MISSION: case MISSIONARY_DENOUNCE_HERESY:
+                case MISSIONARY_ESTABLISH_MISSION:
+                case MISSIONARY_DENOUNCE_HERESY:
                     if (askServer().missionary(unit, direction,
                             act == MissionaryAction.MISSIONARY_DENOUNCE_HERESY)
                             && is.hasMissionary(player)) {
@@ -741,7 +746,7 @@ public final class InGameController extends FreeColClientHolder {
         final Europe europe = player.getEurope();
         if (europe == null) return;
 
-        for (; n > 0 || player.checkEmigrate() ; n--) {
+        for (; n > 0 || player.checkEmigrate(); n--) {
             if (!allSame(europe.getExpandedRecruitables(false))) {
                 showEmigrationDialog(player, fountainOfYouth, n);
                 return;
@@ -852,7 +857,7 @@ public final class InGameController extends FreeColClientHolder {
      * game in the autosave directory.  Does nothing if there is no
      * game running.
      */
-    private void autoSaveGame () {
+    private void autoSaveGame() {
         final Game game = getGame();
         if (game == null) return;
 
@@ -878,7 +883,7 @@ public final class InGameController extends FreeColClientHolder {
                         logger.warning("Could not rename: "
                                 + lastTurnFile.getPath());
                     }
-                } catch (NullPointerException|SecurityException ex) {
+                } catch (NullPointerException | SecurityException ex) {
                     logger.log(Level.WARNING, "Could not rename: "
                             + lastTurnFile.getPath(), ex);
                 }
@@ -1013,9 +1018,13 @@ public final class InGameController extends FreeColClientHolder {
             Runnable uiTask;
             if (endOfTurn) {
                 turnReportMessages.addAll(messages);
-                uiTask = () -> { displayTurnReportMessages(); };
+                uiTask = () -> {
+                    displayTurnReportMessages();
+                };
             } else {
-                uiTask = () -> { getGUI().showModelMessages(messages); };
+                uiTask = () -> {
+                    getGUI().showModelMessages(messages);
+                };
             }
             getGUI().invokeNowOrWait(uiTask);
         }
@@ -1253,7 +1262,7 @@ public final class InGameController extends FreeColClientHolder {
             if (path.getLocation() instanceof Europe) {
                 if (unit.hasTile()
                         && unit.getTile().isDirectlyHighSeasConnected()) {
-                    return moveTowardEurope(unit, (Europe)path.getLocation());
+                    return moveTowardEurope(unit, (Europe) path.getLocation());
                 }
                 logger.warning("Can not move to Europe from "
                         + unit.getLocation()
@@ -1317,7 +1326,7 @@ public final class InGameController extends FreeColClientHolder {
                 // otherwise just move on the map.
                 result = (destination instanceof Europe
                         && getMyPlayer().getEurope() != null)
-                        ? moveTowardEurope(unit, (Europe)destination)
+                        ? moveTowardEurope(unit, (Europe) destination)
                         : (destination == null)
                         ? moveHighSeas(unit, direction)
                         : moveTile(unit, direction);
@@ -1623,10 +1632,10 @@ public final class InGameController extends FreeColClientHolder {
 
             case SETTLEMENT_TRIBUTE:
                 int amount = (settlement instanceof Colony)
-                        ? getGUI().confirmEuropeanTribute(unit, (Colony)settlement,
+                        ? getGUI().confirmEuropeanTribute(unit, (Colony) settlement,
                         nationSummary(settlement.getOwner()))
                         : (settlement instanceof IndianSettlement)
-                        ? getGUI().confirmNativeTribute(unit, (IndianSettlement)settlement)
+                        ? getGUI().confirmNativeTribute(unit, (IndianSettlement) settlement)
                         : -1;
                 if (amount > 0) return moveTribute(unit, amount, direction);
                 break;
@@ -1673,7 +1682,7 @@ public final class InGameController extends FreeColClientHolder {
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement instanceof Colony) {
             final Player player = unit.getOwner();
-            final Colony colony = (Colony)settlement;
+            final Colony colony = (Colony) settlement;
             final Player other = colony.getOwner();
             // Can not negotiate with the REF!
             if (other == player.getREFPlayer()) return false;
@@ -1840,9 +1849,9 @@ public final class InGameController extends FreeColClientHolder {
                     && (stop = unit.getStop()) != null
                     && TradeRoute.isStopValid(unit, stop)
                     && stop.getLocation() instanceof Europe) {
-                return moveTowardEurope(unit, (Europe)stop.getLocation());
+                return moveTowardEurope(unit, (Europe) stop.getLocation());
             } else if (unit.getDestination() instanceof Europe) {
-                return moveTowardEurope(unit, (Europe)unit.getDestination());
+                return moveTowardEurope(unit, (Europe) unit.getDestination());
             } else if (getGUI().confirm(oldTile, StringTemplate
                             .template("highseas.text")
                             .addAmount("%number%", unit.getSailTurns()),
@@ -1872,7 +1881,7 @@ public final class InGameController extends FreeColClientHolder {
         if (askClearGotoOrders(unit)
                 && askServer().askSkill(unit, direction)) {
             IndianSettlement is
-                    = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+                    = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
             UnitType skill = is.getLearnableSkill();
             if (skill == null) {
                 showInformationPanel(is, "info.noMoreSkill");
@@ -1955,9 +1964,86 @@ public final class InGameController extends FreeColClientHolder {
             } else {
                 ; // Automatic movement can continue after successful move.
             }
+
+            //when this event is triggered you either get gold or a unit is added in Europe
+            if (tile.isRiverCorner()) {
+                if (tile.getTriggerEvent()) {
+                    System.out.println("river corner");
+
+                    if (Math.random() < 0.95) {
+                        //add gold
+                        System.out.println("gold event");
+
+                        int gold = (int) (Math.random() * 250);
+                        unit.getOwner().modifyGold(gold);
+                    } else {
+                        sound("sound.event.river");
+                        System.out.println("river add unit event");
+
+                        //add unit to Europe
+                        UnitType Type = getSpecification().getUnitType("model.unit.colonizer");
+                        Unit newUnit = new Unit(getGame(), "");
+
+                        double randExpertise = Math.random();
+                        double randType = Math.random();
+                        /**
+                         * add a unit to Europe
+                         *
+                         * use of a random number to determine the type of unit
+                         *
+                         */
+                        newUnit.setType(getType(randExpertise, randType));
+
+                        newUnit.setOwner(unit.getOwner());
+                        newUnit.setLocation(unit.getOwner().getEurope());
+                        newUnit.setMovesLeft(0);
+                    }
+                }
+                //event triggered no more events in this river tile
+                tile.setTriggerEvent();
+            }
         }
         return ret && !discover;
     }
+
+    private UnitType getType(double randExpertise, double randType) {
+        if (randExpertise >= 0.7) {
+            //expert farmer
+            if (randType <= 0.12)
+                return getSpecification().getUnitType("model.unit.expertFarmer");
+            else if (randType <= 0.24)
+                return getSpecification().getUnitType("model.unit.expertLumberjack");
+            else if (randType <= 0.36)
+                return getSpecification().getUnitType("model.unit.masterCottonPlanter");
+            else if (randType <= 0.48)
+                return getSpecification().getUnitType("model.unit.expertFisherman");
+            else if (randType <= 0.60)
+                return getSpecification().getUnitType("model.unit.expertFurTrapper");
+            else if (randType <= 0.72)
+                return getSpecification().getUnitType("model.unit.expertSilverMiner");
+            else if (randType <= 0.84)
+                return getSpecification().getUnitType("model.unit.masterBlacksmith");
+            else if (randType <= 0.96)
+                return getSpecification().getUnitType("model.unit.expertOreMiner");
+            else
+            return getSpecification().getUnitType("model.unit.frigate");
+
+        } else {
+            if (randType <= 0.1985)
+                return getSpecification().getUnitType("model.unit.freeColonist");
+            else if (randType <= 0.397)
+                return getSpecification().getUnitType("model.unit.soldier");
+            else if (randType <= 0.5955)
+                return getSpecification().getUnitType("model.unit.pettyCriminal");
+            else if (randType <= 0.794)
+                return getSpecification().getUnitType("model.unit.indenturedServant");
+            else if (randType <= 0.9925)
+                return getSpecification().getUnitType("model.unit.IndianConvert");
+            else
+                return getSpecification().getUnitType("model.unit.caravel");
+        }
+    }
+
 
     /**
      * Move to a foreign colony and either attack, negotiate with the
@@ -2084,7 +2170,7 @@ public final class InGameController extends FreeColClientHolder {
             showNegotiationDialog(unit, settlement, agreement,
                     agreement.getSendMessage(player, settlement), direction);
         } else if (settlement instanceof IndianSettlement) {
-            askServer().newNativeTradeSession(unit, (IndianSettlement)settlement);
+            askServer().newNativeTradeSession(unit, (IndianSettlement) settlement);
             changeView(unit, false); // Will be deselected on losing moves
 
         } else {
@@ -2136,7 +2222,7 @@ public final class InGameController extends FreeColClientHolder {
         if (!askClearGotoOrders(unit)) return false;
 
         final IndianSettlement is
-                = (IndianSettlement)getSettlementAt(unit.getTile(), direction);
+                = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         getMissionaryChoice(unit, is, direction);
         return false;
     }
@@ -2550,7 +2636,7 @@ public final class InGameController extends FreeColClientHolder {
             int atStop = trl.getImportAmount(type, 0);
             int amount = toUnload;
             if (amount > atStop) {
-                StringTemplate locName = ((Location)trl).getLocationLabel();
+                StringTemplate locName = ((Location) trl).getLocationLabel();
                 int option = getClientOptions()
                         .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
                 switch (option) {
@@ -2856,7 +2942,7 @@ public final class InGameController extends FreeColClientHolder {
                 // at a colony.
                 for (Unit u : tile.getUnitList()) checkCashInTreasureTrain(u);
                 updateGUI(null, false);
-                showColonyPanelWithCarrier((Colony)tile.getSettlement(), unit);
+                showColonyPanelWithCarrier((Colony) tile.getSettlement(), unit);
             }
         }
         return ret;
@@ -3123,7 +3209,7 @@ public final class InGameController extends FreeColClientHolder {
                 ? 0
                 : player.getLandPrice(tile);
         UnitWas unitWas = (claimant instanceof Unit)
-                ? new UnitWas((Unit)claimant) : null;
+                ? new UnitWas((Unit) claimant) : null;
         boolean ret = askClaimTile(player, tile, claimant, price);
         if (ret) {
             fireChanges(unitWas);
@@ -3538,36 +3624,36 @@ public final class InGameController extends FreeColClientHolder {
         for (FreeColObject fco : children) {
             if (fco instanceof Ability) {
                 if (add) {
-                    parent.addAbility((Ability)fco);
+                    parent.addAbility((Ability) fco);
                 } else {
-                    parent.removeAbility((Ability)fco);
+                    parent.removeAbility((Ability) fco);
                 }
             } else if (fco instanceof Modifier) {
                 if (add) {
-                    parent.addModifier((Modifier)fco);
+                    parent.addModifier((Modifier) fco);
                 } else {
-                    parent.removeModifier((Modifier)fco);
+                    parent.removeModifier((Modifier) fco);
                 }
             } else if (fco instanceof HistoryEvent) {
                 if (parent instanceof Player && add) {
-                    Player player = (Player)parent;
-                    player.addHistory((HistoryEvent)fco);
+                    Player player = (Player) parent;
+                    player.addHistory((HistoryEvent) fco);
                 } else {
                     logger.warning("Feature change NYI: "
                             + parent + "/" + add + "/" + fco);
                 }
             } else if (fco instanceof LastSale) {
                 if (parent instanceof Player && add) {
-                    Player player = (Player)parent;
-                    player.addLastSale((LastSale)fco);
+                    Player player = (Player) parent;
+                    player.addLastSale((LastSale) fco);
                 } else {
                     logger.warning("Feature change NYI: "
                             + parent + "/" + add + "/" + fco);
                 }
             } else if (fco instanceof ModelMessage) {
                 if (parent instanceof Player && add) {
-                    Player player = (Player)parent;
-                    player.addModelMessage((ModelMessage)fco);
+                    Player player = (Player) parent;
+                    player.addModelMessage((ModelMessage) fco);
                 } else {
                     logger.warning("Feature change NYI: "
                             + parent + "/" + add + "/" + fco);
@@ -3869,7 +3955,7 @@ public final class InGameController extends FreeColClientHolder {
         UnitWas sourceWas = null;
         ColonyWas colonyWas = null;
         if (goods.getLocation() instanceof Unit) {
-            Unit source = (Unit)goods.getLocation();
+            Unit source = (Unit) goods.getLocation();
             sourceWas = new UnitWas(source);
         } else {
             Colony colony = carrier.getColony();
@@ -3988,8 +4074,10 @@ public final class InGameController extends FreeColClientHolder {
 
         boolean ret = false;
         switch (action) {
-            case RAISE_TAX_ACT: case RAISE_TAX_WAR:
-            case MONARCH_MERCENARIES: case HESSIAN_MERCENARIES:
+            case RAISE_TAX_ACT:
+            case RAISE_TAX_WAR:
+            case MONARCH_MERCENARIES:
+            case HESSIAN_MERCENARIES:
                 ret = askServer().answerMonarch(action, accept);
                 break;
             default:
@@ -4036,7 +4124,7 @@ public final class InGameController extends FreeColClientHolder {
                 sound("sound.event.illegalMove");
                 return false;
             }
-            return moveTowardEurope(unit, (Europe)destination);
+            return moveTowardEurope(unit, (Europe) destination);
         } else if (destination instanceof Map) {
             if (unit.hasTile()
                     // Will we have multiple maps one day?
@@ -4412,22 +4500,22 @@ public final class InGameController extends FreeColClientHolder {
                     break;
                 case GIFT:
                     /**
-                    act = null;
-                    nti = getGUI().getChoice(unit.getTile(),
-                            StringTemplate.key("gift.text"),
-                            is, "cancel",
-                            transform(nt.getUnitToSettlement(), alwaysTrue(),
-                                    goodsMapper));
-                    if (nti != null) {
-                        nt.setItem(nti);
-                        askServer().nativeTrade(NativeTradeAction.GIFT, nt);
-                        return;
-                    }
-                    break;
-                default:
-                    logger.warning("showIndianSettlementTradeDialog fail: "
-                            + act);
-                    nt.setDone();
+                     act = null;
+                     nti = getGUI().getChoice(unit.getTile(),
+                     StringTemplate.key("gift.text"),
+                     is, "cancel",
+                     transform(nt.getUnitToSettlement(), alwaysTrue(),
+                     goodsMapper));
+                     if (nti != null) {
+                     nt.setItem(nti);
+                     askServer().nativeTrade(NativeTradeAction.GIFT, nt);
+                     return;
+                     }
+                     break;
+                     default:
+                     logger.warning("showIndianSettlementTradeDialog fail: "
+                     + act);
+                     nt.setDone();
                      */
                     System.out.println("gifting");
                     break;
@@ -4644,7 +4732,7 @@ public final class InGameController extends FreeColClientHolder {
 
         final Player player = getMyPlayer();
         if ((fcgo instanceof Player && (fcgo == player))
-                || ((fcgo instanceof Ownable) && player.owns((Ownable)fcgo))) {
+                || ((fcgo instanceof Ownable) && player.owns((Ownable) fcgo))) {
             player.invalidateCanSeeTiles();//+vis(player)
         }
     }
@@ -4819,7 +4907,7 @@ public final class InGameController extends FreeColClientHolder {
             if (divert != null) player.divertModelMessages(fcgo, divert);
 
             if (fcgo instanceof Settlement) {
-                Settlement settlement = (Settlement)fcgo;
+                Settlement settlement = (Settlement) fcgo;
                 if (settlement.getOwner() != null) {
                     settlement.getOwner().removeSettlement(settlement);
                 }
@@ -4827,7 +4915,7 @@ public final class InGameController extends FreeColClientHolder {
 
             } else if (fcgo instanceof Unit) {
                 // Deselect the object if it is the current active unit.
-                Unit u = (Unit)fcgo;
+                Unit u = (Unit) fcgo;
                 updateUnit |= u == getGUI().getActiveUnit();
 
                 // Temporary hack until we have real containers.
@@ -4857,7 +4945,7 @@ public final class InGameController extends FreeColClientHolder {
     public boolean rename(Nameable object) {
         final Player player = getMyPlayer();
         if (!(object instanceof Ownable)
-                || !player.owns((Ownable)object)) return false;
+                || !player.owns((Ownable) object)) return false;
 
         String name = null;
         if (object instanceof Colony) {
@@ -4874,7 +4962,7 @@ public final class InGameController extends FreeColClientHolder {
                 return false;
             } else if (player.getSettlementByName(name) != null) {
                 // Colony name must be unique.
-                showInformationPanel((Colony)object, StringTemplate
+                showInformationPanel((Colony) object, StringTemplate
                         .template("nameColony.notUnique")
                         .addName("%name%", name));
                 return false;
@@ -4891,7 +4979,7 @@ public final class InGameController extends FreeColClientHolder {
             return false;
         }
 
-        if (askServer().rename((FreeColGameObject)object, name)) {
+        if (askServer().rename((FreeColGameObject) object, name)) {
             updateGUI(null, false);
             return true;
         }
@@ -4996,7 +5084,7 @@ public final class InGameController extends FreeColClientHolder {
             if (destination instanceof Europe) {
                 if (unit.hasTile()
                         && unit.getTile().isDirectlyHighSeasConnected()) {
-                    moveTowardEurope(unit, (Europe)destination);
+                    moveTowardEurope(unit, (Europe) destination);
                 } else {
                     moveToDestination(unit, null);
                 }
@@ -5029,7 +5117,7 @@ public final class InGameController extends FreeColClientHolder {
                 || !requireOurTurn()) return false;
 
         final Player player = getMyPlayer();
-        Unit carrier = (Unit)goods.getLocation();
+        Unit carrier = (Unit) goods.getLocation();
 
         EuropeWas europeWas = new EuropeWas(player.getEurope());
         MarketWas marketWas = new MarketWas(player);
@@ -5199,7 +5287,7 @@ public final class InGameController extends FreeColClientHolder {
      *
      * No status returned to connect controller.
      */
-    public void setGameConnected () {
+    public void setGameConnected() {
         final Player player = getMyPlayer();
         if (player != null) {
             player.refilterModelMessages(getClientOptions());
@@ -5364,7 +5452,7 @@ public final class InGameController extends FreeColClientHolder {
                 || !requireOurTurn()) return false;
 
         // Find the carrier
-        final Unit carrier = (Unit)goods.getLocation();
+        final Unit carrier = (Unit) goods.getLocation();
 
         // Use Europe-specific routine if needed
         if (carrier.isInEurope()) return sellGoods(goods);
@@ -5402,7 +5490,7 @@ public final class InGameController extends FreeColClientHolder {
                 logger.warning("Update copy-in failed: " + fco.getId());
                 continue;
             } else if (fco instanceof Tile) {
-                invokeLater(() -> getGUI().refreshTile((Tile)fco));
+                invokeLater(() -> getGUI().refreshTile((Tile) fco));
             }
         }
         player.invalidateCanSeeTiles(); //+vis(player)

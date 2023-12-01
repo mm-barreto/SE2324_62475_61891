@@ -76,6 +76,16 @@ public final class Tile extends UnitLocation implements Named, Ownable {
 
     public static final String TAG = "tile";
 
+    public static boolean eventTriggered = false;
+
+    public void setTriggerEvent() {
+        eventTriggered = true;
+    }
+
+    public boolean getTriggerEvent() {
+        return !eventTriggered;
+    }
+
     /** Comparator to sort tiles by increasing distance from the edge. */
     public static final Comparator<Tile> edgeDistanceComparator
         = Comparator.comparingInt(Tile::getEdgeDistance);

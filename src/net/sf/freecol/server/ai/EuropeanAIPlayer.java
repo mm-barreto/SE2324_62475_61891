@@ -63,44 +63,13 @@ import javax.xml.stream.XMLStreamException;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.AbstractUnit;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTradeItem;
+import net.sf.freecol.common.model.*;
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
-import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeContext;
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
-import net.sf.freecol.common.model.Europe;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoldTradeItem;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Market;
-import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.NationSummary;
-import net.sf.freecol.common.model.NativeTrade;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Role;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Specification;
-import net.sf.freecol.common.model.Stance;
-import net.sf.freecol.common.model.StanceTradeItem;
-import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.TradeItem;
-import net.sf.freecol.common.model.Turn;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDeciders;
 import net.sf.freecol.common.option.GameOptions;
@@ -2857,6 +2826,11 @@ public class EuropeanAIPlayer extends MissionAIPlayer {
     public NativeTradeAction handleTrade(NativeTradeAction action,
                                          NativeTrade nt) {
         return NativeTradeAction.NAK_INVALID;
+    }
+
+    @Override
+    public NativeRecruit.NativeRecruitAction handleTrade(NativeRecruit.NativeRecruitAction action, NativeRecruit nt) {
+        return null;
     }
 
 
