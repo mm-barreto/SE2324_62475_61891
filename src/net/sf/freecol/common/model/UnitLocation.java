@@ -178,7 +178,7 @@ public abstract class UnitLocation extends FreeColGameObject implements Location
      * @param u The {@code Unit} to add.
      * @return True if the unit is added.
      */
-    private boolean addUnit(Unit u) {
+    public boolean addUnit(Unit u) {
         if (u == null) return false;
         boolean ret = false;
         u.setLocationNoUpdate(this);
