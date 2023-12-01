@@ -28,13 +28,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
-
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.i18n.Messages;
 import net.sf.freecol.common.io.FreeColXMLReader;
 import net.sf.freecol.common.io.FreeColXMLWriter;
 import net.sf.freecol.common.model.*;
-
+import net.sf.freecol.common.model.DiplomaticTrade;
 import static net.sf.freecol.common.model.Constants.*;
 
 import net.sf.freecol.common.model.DiplomaticTrade.TradeStatus;
@@ -47,6 +47,18 @@ import net.sf.freecol.common.util.LogBuilder;
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
+import net.sf.freecol.common.model.NationSummary;
+import net.sf.freecol.common.model.NativeTrade;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Stance;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Market;
 
 
 /**

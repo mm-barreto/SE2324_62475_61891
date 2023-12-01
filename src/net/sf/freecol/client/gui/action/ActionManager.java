@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.client.control.InGameController;
 
 
 /**

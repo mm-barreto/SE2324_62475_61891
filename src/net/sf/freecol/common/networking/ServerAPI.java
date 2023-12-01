@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NativeTrade.NativeTradeAction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.option.OptionGroup;
+import java.lang.reflect.InvocationTargetException;
 
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Colony;
@@ -51,6 +52,8 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Direction;
+
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.common.model.Constants.IndianDemandAction;
 import net.sf.freecol.common.model.Game.LogoutReason;
@@ -73,6 +76,8 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.NativeRecruit.NativeRecruitAction;
 
 
 /**

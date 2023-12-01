@@ -48,7 +48,10 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Specification;
 
+import javax.swing.AbstractButton;
+import javax.swing.Action;
 
+import net.sf.freecol.client.control.InGameController;
 
 /**
  * Superclass for all panels in FreeCol.

@@ -47,7 +47,7 @@ import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.option.Option;
-
+import net.sf.freecol.client.control.InGameController;
 
 /**
  * The super class of all actions in FreeCol.  Subclasses of this

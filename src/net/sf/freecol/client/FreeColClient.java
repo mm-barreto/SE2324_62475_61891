@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client;
 
+
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,6 +37,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ClientInputHandler;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.MapEditorController;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.SoundController;
 import net.sf.freecol.client.gui.GUI;

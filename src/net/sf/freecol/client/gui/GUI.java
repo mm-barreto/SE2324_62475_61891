@@ -97,6 +97,13 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * The API and common reusable functionality for the overall GUI.

@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitLabelType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.client.control.InGameController;
 
 
 /**
