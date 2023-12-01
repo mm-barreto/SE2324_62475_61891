@@ -1989,6 +1989,8 @@ public final class InGameController extends FreeColClientHolder {
                     //getGUI().("You have found " + gold + " gold in the river!");
                     showEventPanel("Event triggered", "", "You have found " + gold + " gold in the river!");
                 }
+
+                unit.getTile().setTriggerEvent();
             }
         }
         return ret && !discover;
